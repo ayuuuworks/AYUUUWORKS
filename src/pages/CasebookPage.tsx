@@ -1,319 +1,369 @@
-import React, { useMemo, useState } from 'react';
-import { ArrowUpRight, Bookmark, ExternalLink, Camera, FileText, Play, Search, Sparkles, Check, LockKeyhole, X } from 'lucide-react';
-import { caseFiles, caseFilters } from '../casebook/data/cases';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ArrowDown, ArrowRight, Bookmark, Check, ExternalLink, Eye, Filter, Play, Plus, Search, Volume2, VolumeX, X } from 'lucide-react';
+import { caseFiles, caseFilters, type CaseFile, type CaseMedia } from '../casebook/data/cases';
 import { MediaEvidence } from '../casebook/components/MediaEvidence';
 import { MediaLightbox } from '../casebook/components/MediaLightbox';
-import { Caseboard, SavedClue } from '../casebook/components/Caseboard';
+import { Caseboard, type SavedClue } from '../casebook/components/Caseboard';
 import { BrainPanel } from '../casebook/components/BrainPanel';
 import { BusinessExplorer } from '../casebook/components/BusinessExplorer';
-import { SoundControl, SoundMode, useCasebookSound } from '../casebook/sound';
-import { VisualDiscovery, InspirationItem } from '../casebook/components/VisualDiscovery';
+import { VisualDiscovery, type InspirationItem } from '../casebook/components/VisualDiscovery';
+import { SoundControl, type SoundMode, useCasebookSound } from '../casebook/sound';
 
-const evidence = [
-  { label: 'EVIDENCE', title: 'REAL CAMPAIGNS', text: 'Ads, launches aur brand moments jo actually duniya ne dekhe.', icon: Camera },
-  { label: 'FOOTAGE', title: 'VIDEO CLUES', text: 'Campaign films aur social moments. Play karo, phir clue dhoondo.', icon: Play },
-  { label: 'INTERNET', title: 'MEMES & REACTIONS', text: 'Jahan public reaction khud story ka part ban jaata hai.', icon: Sparkles },
-  { label: 'BRAIN NOTE', title: 'AYUUWORKS TAKE', text: 'Fact ke baad interpretation. Dono ko mix nahi karenge.', icon: FileText },
-];
+const ink = '#111111';
+const paper = '#F2EFE8';
+const stone = '#E8E3DA';
+const orange = '#B65B3C';
+
+const saveClue = (item: CaseFile, clue: string, id: string): SavedClue => ({
+  id,
+  caseId: item.id,
+  caseNumber: item.number,
+  caseTitle: item.title,
+  clue,
+});
 
 export const CasebookPage: React.FC = () => {
   const [filter, setFilter] = useState<(typeof caseFilters)[number]>('ALL');
+  const [activeCase, setActiveCase] = useState<CaseFile | null>(null);
+  const [activeMedia, setActiveMedia] = useState<CaseMedia | null>(null);
   const [saved, setSaved] = useState<SavedClue[]>(() => {
     try { return JSON.parse(localStorage.getItem('ayuuworks-caseboard') || '[]'); } catch { return []; }
   });
-  const [activeMedia, setActiveMedia] = useState<import('../casebook/data/cases').CaseMedia | null>(null);
-  const [activeCase, setActiveCase] = useState<(typeof caseFiles)[number] | null>(null);
-  const [revealed, setRevealed] = useState<string[]>([]);
+  const [visualSaved, setVisualSaved] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('ayuuworks-visual-trail') || '[]'); } catch { return []; }
+  });
   const [caseboardOpen, setCaseboardOpen] = useState(false);
   const [brainOpen, setBrainOpen] = useState(false);
   const [explorerOpen, setExplorerOpen] = useState(false);
-  const [visualSaved, setVisualSaved] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem('ayuuworks-visual-trail') || '[]'); } catch { return []; } });
+  const [soundMode, setSoundMode] = useState<SoundMode>(() => (localStorage.getItem('ayuuworks-casebook-sound') as SoundMode) || 'QUIET');
   const [projectBriefOpen, setProjectBriefOpen] = useState(false);
   const [projectContext, setProjectContext] = useState({ businessType: '', businessName: '' });
-  const [soundMode, setSoundMode] = useState<SoundMode>(() => (localStorage.getItem('ayuuworks-casebook-sound') as SoundMode) || 'QUIET');
   const playSound = useCasebookSound(soundMode);
 
-
+  const featured = caseFiles.find((item) => item.featured) || caseFiles[0];
   const visibleCases = useMemo(
     () => filter === 'ALL' ? caseFiles : caseFiles.filter((item) => item.type === filter),
     [filter]
   );
 
-  const reveal = (key: string) => { playSound('clue'); setRevealed((current) => current.includes(key) ? current : [...current, key]); };
+  useEffect(() => { localStorage.setItem('ayuuworks-caseboard', JSON.stringify(saved)); }, [saved]);
+  useEffect(() => { localStorage.setItem('ayuuworks-visual-trail', JSON.stringify(visualSaved)); }, [visualSaved]);
+  useEffect(() => { localStorage.setItem('ayuuworks-casebook-sound', soundMode); }, [soundMode]);
 
-  const saveDiscoveredClue = (caseItem: (typeof caseFiles)[number], clue: string, index: number) => {
-    const entry: SavedClue = { id: caseItem.id + '-discovered-' + index, caseId: caseItem.id, caseNumber: caseItem.number, caseTitle: caseItem.title, clue };
+  useEffect(() => {
+    const open = () => setCaseboardOpen(true);
+    window.addEventListener('open-caseboard', open);
+    return () => window.removeEventListener('open-caseboard', open);
+  }, []);
+
+  const pin = (item: CaseFile, clue = item.clue, id = item.id + '-main-clue') => {
     playSound('pin');
-    setSaved((current) => current.some((item) => item.id === entry.id) ? current : [...current, entry]);
+    setSaved((current) => current.some((entry) => entry.id === id)
+      ? current.filter((entry) => entry.id !== id)
+      : [...current, saveClue(item, clue, id)]);
   };
 
-  const toggleSaved = (id: string) => {
-    const item = caseFiles.find((entry) => entry.id === id);
-    if (!item) return;
-    const clue: SavedClue = { id: item.id + '-main-clue', caseId: item.id, caseNumber: item.number, caseTitle: item.title, clue: item.clue };
-    playSound('pin');
-    setSaved((current) => current.some((entry) => entry.id === clue.id) ? current.filter((entry) => entry.id !== clue.id) : [...current, clue]);
+  const startProject = (payload: { businessType: string; businessName: string }) => {
+    setProjectContext(payload);
+    setExplorerOpen(false);
+    setProjectBriefOpen(true);
+    playSound('evidence');
   };
 
-  React.useEffect(() => { localStorage.setItem('ayuuworks-caseboard', JSON.stringify(saved)); }, [saved]);
-  React.useEffect(() => { localStorage.setItem('ayuuworks-casebook-sound', soundMode); }, [soundMode]);
-  React.useEffect(() => { localStorage.setItem('ayuuworks-visual-trail', JSON.stringify(visualSaved)); }, [visualSaved]);
-  const saveVisual = (item: InspirationItem) => { playSound('pin'); setVisualSaved((current) => current.includes(item.id) ? current : [...current, item.id]); };
-  const startProject = (payload: { businessType: string; businessName: string }) => { setProjectContext(payload); setExplorerOpen(false); setProjectBriefOpen(true); playSound('evidence'); };
-  const handoffProject = () => { localStorage.setItem('ayuuworks-project-handoff', JSON.stringify({ ...projectContext, savedClues: saved.length, visualReferences: visualSaved.length, timestamp: new Date().toISOString() })); window.location.href = '/#enquiry-experience'; };
-  React.useEffect(() => { const open = () => setCaseboardOpen(true); window.addEventListener('open-caseboard', open); return () => window.removeEventListener('open-caseboard', open); }, []);
+  const handoffProject = () => {
+    localStorage.setItem('ayuuworks-project-handoff', JSON.stringify({
+      ...projectContext,
+      savedClues: saved.length,
+      visualReferences: visualSaved.length,
+      timestamp: new Date().toISOString()
+    }));
+    window.location.href = '/#enquiry-experience';
+  };
 
   return (
-    <main className="min-h-screen bg-[#F2EFE8] text-[#111111] pt-16">
-      <section className="relative overflow-hidden border-b border-[#111111]/15 bg-[#F2EFE8]">
-        <div className="absolute inset-0 opacity-[0.035]" style={{
-          backgroundImage: 'linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
+    <main className="relative min-h-screen overflow-hidden bg-[#F2EFE8] text-[#111111]">
+      <section className="relative min-h-[92vh] overflow-hidden bg-[#111111] text-[#F2EFE8]">
+        <div className="absolute inset-0 opacity-25" style={{
+          backgroundImage: 'radial-gradient(circle at 72% 30%, rgba(182,91,60,.55), transparent 27%), radial-gradient(circle at 20% 80%, rgba(255,255,255,.12), transparent 24%), linear-gradient(125deg, transparent 0 48%, rgba(255,255,255,.05) 48% 48.2%, transparent 48.2%)'
         }} />
-        <div className="relative mx-auto max-w-[1500px] px-5 py-8 md:px-10 md:py-12">
-          <div className="flex items-center justify-between border-b border-[#111111]/20 pb-4 text-[10px] uppercase tracking-[0.24em]">
-            <span>AYUUWORKS / THE CASEBOOK</span>
-            <span>VOL. 01 / BUSINESS INTELLIGENCE DESK</span>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(17,17,17,.05),rgba(17,17,17,.72)_82%,#111_100%)]" />
+        <div className="relative mx-auto flex min-h-[92vh] max-w-[1600px] flex-col px-5 pb-8 pt-28 md:px-10 md:pt-36">
+          <div className="flex items-center justify-between border-b border-[#F2EFE8]/15 pb-4 font-mono text-[9px] uppercase tracking-[0.22em] text-[#D7D0C5]">
+            <span>AYUUWORKS / CASEBOOK</span>
+            <span>VOL. 01 / {caseFiles.length} CASES</span>
           </div>
 
-          <div className="grid gap-8 py-12 md:grid-cols-[1.2fr_0.8fr] md:items-end md:py-20">
+          <div className="flex flex-1 flex-col justify-center py-16 md:grid md:grid-cols-[1.1fr_.9fr] md:items-end md:gap-12">
             <div>
-              <p className="mb-5 font-mono text-[10px] uppercase tracking-[0.3em] text-[#B65B3C]">
-                Special Investigation
+              <p className="mb-6 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.3em] text-[#B65B3C]">
+                <span className="h-px w-10 bg-[#B65B3C]" /> CASE FILES / REAL WORLD
               </p>
-              <h1 className="max-w-5xl font-display text-[clamp(3rem,8vw,8.5rem)] font-semibold uppercase leading-[0.82] tracking-[-0.065em]">
-                KUCH BRANDS<br />
-                <span className="text-[#B65B3C]">DIKHNA</span> BAND<br />
-                NAHI HOTE.
+              <h1 className="max-w-6xl font-display text-[clamp(4rem,10.5vw,11rem)] font-semibold uppercase leading-[.78] tracking-[-.075em]">
+                LOOK AT<br /><span className="text-[#B65B3C]">WHAT</span><br />STICKS.
               </h1>
             </div>
-            <div className="max-w-md border-l border-[#111111]/20 pl-6">
-              <p className="text-xl leading-snug md:text-2xl">
-                Kuch businesses famous hue. Kuch yaad reh gaye. Sawal ye hai...
-                <strong> kyun?</strong>
+            <div className="max-w-xl pb-2">
+              <p className="font-display text-3xl leading-[.98] md:text-5xl">Business ke cases. Marketing ke clues. Internet ki kahaniyan.</p>
+              <p className="mt-6 max-w-lg text-sm leading-7 text-[#C9C2B8]">
+                Famous campaigns ko sirf dekhna nahi. Unke andar woh decision dhoondhna hai jo attention, memory ya behaviour ko change karta hai.
               </p>
-              <p className="mt-5 text-sm leading-7 text-[#4d4943]">
-                Real campaigns, visual clues, internet culture aur AyuuWorks ki nazar.
-                Case kholo. Evidence dekho. Pattern pakdo.
-              </p>
-              <div className="mt-7 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em]">
-                <span className="h-2 w-2 rounded-full bg-[#B65B3C]" />
-                Investigation archive active
-              </div>
+              <button onClick={() => document.getElementById('open-investigations')?.scrollIntoView({ behavior: 'smooth' })} className="mt-8 inline-flex items-center gap-3 border border-[#F2EFE8]/25 px-5 py-4 text-[9px] font-semibold uppercase tracking-[0.18em] transition hover:border-[#B65B3C] hover:bg-[#B65B3C]">
+                OPEN THE FILES <ArrowDown className="h-4 w-4" />
+              </button>
             </div>
           </div>
 
-          <div className="grid border-y border-[#111111]/20 md:grid-cols-4">
-            {evidence.map(({ label, title, text, icon: Icon }) => (
-              <div key={title} className="min-h-[190px] border-b border-[#111111]/15 p-5 md:border-b-0 md:border-r last:border-r-0">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[9px] tracking-[0.2em] text-[#B65B3C]">{label}</span>
-                  <Icon className="h-4 w-4 opacity-50" strokeWidth={1.5} />
-                </div>
-                <h2 className="mt-10 font-display text-lg font-semibold uppercase tracking-tight">{title}</h2>
-                <p className="mt-3 text-sm leading-6 text-[#5b574f]">{text}</p>
-              </div>
-            ))}
+          <div className="grid border-t border-[#F2EFE8]/15 pt-4 text-[9px] uppercase tracking-[0.17em] text-[#A9A29A] md:grid-cols-3">
+            <span>REAL SOURCES</span><span className="hidden md:block">NO INVENTED RESULTS</span><span className="md:text-right">FACT → CLUE → INTERPRETATION</span>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1500px] px-5 py-12 md:px-10 md:py-20">
-        <div className="mb-8 flex flex-col gap-5 border-b border-[#111111]/20 pb-6 md:flex-row md:items-end md:justify-between">
+      <section id="open-investigations" className="mx-auto max-w-[1600px] px-5 py-20 md:px-10 md:py-32">
+        <div className="grid gap-10 border-b border-[#111111]/15 pb-12 md:grid-cols-[.72fr_1.28fr]">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#B65B3C]">Case Files</p>
-            <h2 className="mt-2 font-display text-4xl font-semibold uppercase tracking-[-0.04em] md:text-6xl">
-              OPEN INVESTIGATIONS
-            </h2>
+            <p className="font-mono text-[9px] tracking-[0.25em] text-[#B65B3C]">FEATURED / CASE {featured.number}</p>
+            <h2 className="mt-4 font-display text-5xl font-semibold uppercase leading-[.84] tracking-[-.06em] md:text-8xl">THE CASE<br />THAT OPENS<br />THE BOOK.</h2>
+            <p className="mt-7 max-w-md text-sm leading-7 text-[#514c45]">{featured.summary}</p>
+          </div>
+
+          <button onClick={() => { playSound('media'); setActiveCase(featured); }} className="group relative min-h-[520px] overflow-hidden bg-[#171716] text-left md:min-h-[650px]">
+            <div className="absolute inset-0 opacity-80" style={{
+              backgroundImage: 'radial-gradient(circle at 72% 28%, rgba(182,91,60,.85), transparent 19%), radial-gradient(circle at 24% 72%, rgba(242,239,232,.13), transparent 24%), linear-gradient(135deg,#2a2825,#111 55%,#3a241d)'
+            }} />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,rgba(0,0,0,.88)_100%)]" />
+            <div className="absolute left-6 top-6 flex items-center gap-3 text-[#F2EFE8]">
+              <span className="border border-[#F2EFE8]/25 bg-[#111]/50 px-3 py-2 font-mono text-[8px] tracking-[.18em]">CASE / {featured.number}</span>
+              <span className="border border-[#B65B3C] bg-[#B65B3C]/15 px-3 py-2 font-mono text-[8px] tracking-[.18em]">{featured.status}</span>
+            </div>
+            <div className="absolute inset-x-7 bottom-8">
+              <p className="font-mono text-[9px] tracking-[.2em] text-[#B65B3C]">{featured.kicker}</p>
+              <h3 className="mt-4 max-w-4xl font-display text-4xl font-semibold uppercase leading-[.84] tracking-[-.045em] text-[#F2EFE8] md:text-7xl">{featured.title}</h3>
+              <div className="mt-7 flex items-center justify-between border-t border-[#F2EFE8]/20 pt-4">
+                <span className="text-[9px] uppercase tracking-[.15em] text-[#C9C2B8]">OPEN INVESTIGATION</span>
+                <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#F2EFE8]/25 transition group-hover:bg-[#B65B3C]"><ArrowRight className="h-4 w-4" /></span>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        <div className="mt-12 grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
+          <div>
+            <p className="font-mono text-[9px] tracking-[.25em] text-[#B65B3C]">THE ARCHIVE</p>
+            <h2 className="mt-3 font-display text-5xl font-semibold uppercase tracking-[-.055em] md:text-7xl">OPEN INVESTIGATIONS.</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             {caseFilters.map((item) => (
-              <button
-                key={item}
-                onClick={() => setFilter(item)}
-                className={`border px-3 py-2 text-[10px] font-semibold tracking-[0.16em] transition-colors ${filter === item ? 'border-[#111111] bg-[#111111] text-[#F2EFE8]' : 'border-[#111111]/20 hover:border-[#B65B3C]'}`}
-              >
+              <button key={item} onClick={() => setFilter(item)} className={'border px-3 py-2 text-[9px] font-semibold tracking-[.15em] transition ' + (filter === item ? 'border-[#111] bg-[#111] text-[#F2EFE8]' : 'border-[#111]/15 hover:border-[#B65B3C]')}>
                 {item}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="columns-1 gap-5 md:columns-2 xl:columns-3">
+        <div className="mt-10 grid gap-px border border-[#111111]/15 bg-[#111111]/15 md:grid-cols-2 xl:grid-cols-4">
           {visibleCases.map((item, index) => {
-            const isSaved = saved.some((entry) => entry.caseId === item.id);
+            const isPinned = saved.some((entry) => entry.id === item.id + '-main-clue');
             return (
-              <article
-                key={item.id}
-                className={`mb-5 break-inside-avoid border border-[#111111]/15 bg-[#ebe7df] p-5 ${item.featured ? 'md:p-7' : ''}`}
-              >
-                <div className="flex items-center justify-between border-b border-[#111111]/15 pb-3">
-                  <span className="font-mono text-[10px] tracking-[0.18em]">CASE / {item.number}</span>
-                  <span className="text-[9px] font-semibold tracking-[0.16em] text-[#B65B3C]">{item.status}</span>
+              <article key={item.id} className="group bg-[#F2EFE8] p-5 transition hover:bg-[#E8E3DA] md:p-6">
+                <div className="flex items-center justify-between font-mono text-[8px] tracking-[.16em]">
+                  <span>CASE / {item.number}</span><span className="text-[#B65B3C]">{item.year}</span>
                 </div>
-
-                <div className="my-5 grid gap-3">
-                  {item.media.slice(0, 2).map((media) => (
-                    <button key={media.title} onClick={() => { playSound('media'); setActiveMedia(media); }} className="text-left" aria-label={`Open ${media.title}`}>
-                      <MediaEvidence media={media} compact />
-                    </button>
-                  ))}
-                </div>
-
-                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#B65B3C]">{item.kicker}</p>
-                <h3 className="mt-3 font-display text-2xl font-semibold uppercase leading-[0.95] tracking-[-0.035em]">
-                  {item.title}
-                </h3>
-                <p className="mt-4 text-sm leading-6 text-[#4d4943]">{item.summary}</p>
-                <div className="mt-4 flex flex-wrap gap-2 text-[8px] font-mono uppercase tracking-[0.12em] text-[#6b665d]">
-                  {item.year && <span className="border border-[#111111]/15 px-2 py-1">{item.year}</span>}
-                  {item.region && <span className="border border-[#111111]/15 px-2 py-1">{item.region}</span>}
-                  <span className="border border-[#111111]/15 px-2 py-1">{item.sources.length} SOURCE{item.sources.length === 1 ? '' : 'S'}</span>
-                </div>
-                <div className="mt-4 border-t border-[#111111]/10 pt-3">
-                  <p className="font-mono text-[8px] tracking-[0.16em] text-[#B65B3C]">RESEARCH TRAIL</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {item.sources.map((sourceItem) => (
-                      <a key={sourceItem.url} href={sourceItem.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 border border-[#111111]/15 px-2 py-1 text-[8px] uppercase tracking-[0.08em] hover:border-[#B65B3C]">
-                        {sourceItem.type === 'PRIMARY' ? 'PRIMARY' : 'SECONDARY'} / {sourceItem.name} <ExternalLink className="h-2.5 w-2.5" />
-                      </a>
-                    ))}
+                <div className="relative mt-5 aspect-[4/3] overflow-hidden bg-[#22211F]">
+                  <div className="absolute inset-0" style={{ backgroundImage: index % 2 ? 'radial-gradient(circle at 75% 25%,rgba(182,91,60,.75),transparent 22%),linear-gradient(145deg,#34312c,#111)' : 'linear-gradient(125deg,#111 20%,#6b3b2d 100%)' }} />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,rgba(0,0,0,.7))]" />
+                  <div className="absolute inset-x-4 bottom-4">
+                    <span className="font-mono text-[8px] tracking-[.16em] text-[#D7D0C5]">{item.field}</span>
                   </div>
                 </div>
-
-                <div className="mt-6 border-l-2 border-[#B65B3C] bg-[#F2EFE8] p-4">
-                  <p className="font-mono text-[9px] tracking-[0.18em] text-[#B65B3C]">CLUE</p>
-                  <p className="mt-2 text-sm font-medium leading-6">{item.clue}</p>
-                </div>
-
-                <div className="mt-5 flex items-center justify-between">
-                  <button onClick={() => { setActiveCase(item); setRevealed([]); }} className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] hover:text-[#B65B3C]">
-                    CASE KHOLO <ArrowUpRight className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => toggleSaved(item.id)}
-                    aria-label={isSaved ? 'Remove clue from caseboard' : 'Save clue to caseboard'}
-                    className={`inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.12em] ${isSaved ? 'text-[#B65B3C]' : 'text-[#6c675e]'}`}
-                  >
-                    <Bookmark className="h-3.5 w-3.5" fill={isSaved ? 'currentColor' : 'none'} />
-                    {isSaved ? 'SAVED' : 'CASEBOARD MEIN DAALO'}
+                <p className="mt-6 font-mono text-[8px] tracking-[.18em] text-[#B65B3C]">{item.kicker}</p>
+                <h3 className="mt-3 font-display text-2xl font-semibold uppercase leading-[.9] tracking-[-.035em]">{item.title}</h3>
+                <p className="mt-4 text-xs leading-6 text-[#5B574F]">{item.summary}</p>
+                <div className="mt-6 flex items-center justify-between border-t border-[#111]/10 pt-4">
+                  <button onClick={() => { playSound('clue'); setActiveCase(item); }} className="text-[9px] font-semibold uppercase tracking-[.15em] hover:text-[#B65B3C]">OPEN CASE <ArrowRight className="ml-1 inline h-3 w-3" /></button>
+                  <button onClick={() => pin(item)} aria-label="Save clue" className={'flex items-center gap-1.5 text-[8px] uppercase tracking-[.12em] ' + (isPinned ? 'text-[#B65B3C]' : 'text-[#6B665D]')}>
+                    <Bookmark className="h-3.5 w-3.5" fill={isPinned ? 'currentColor' : 'none'} /> {isPinned ? 'PINNED' : 'PIN'}
                   </button>
                 </div>
               </article>
             );
           })}
         </div>
+      </section>
 
-        <VisualDiscovery savedIds={visualSaved} onSave={saveVisual} />
-
-        <div className="mt-20 border-t border-[#111111]/20 pt-8">
-          <div className="mt-10 border border-[#111111]/20 bg-[#111111] p-6 text-[#F2EFE8] md:p-8">
-            <p className="font-mono text-[9px] tracking-[0.2em] text-[#B65B3C]">NEXT INVESTIGATION</p>
-            <div className="mt-3 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div>
-                <h3 className="font-display text-3xl font-semibold uppercase tracking-[-0.04em] md:text-5xl">AB YEHI LENS APNE BUSINESS PE LAGAO.</h3>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#D7D0C5]">Casebook se nikle clues ko apne business context mein test karo. 30 seconds. No score.</p>
-              </div>
-              <button onClick={() => setExplorerOpen(true)} className="inline-flex shrink-0 items-center justify-center gap-3 border border-[#B65B3C] px-5 py-4 text-[10px] font-semibold uppercase tracking-[0.18em] hover:bg-[#B65B3C]">OPEN MY CASE <ArrowUpRight className="h-4 w-4" /></button>
-            </div>
+      <section className="relative overflow-hidden bg-[#111111] px-5 py-24 text-[#F2EFE8] md:px-10 md:py-36">
+        <div className="absolute right-[-8%] top-[-15%] h-[480px] w-[480px] rounded-full border border-[#B65B3C]/25" />
+        <div className="absolute right-[2%] top-[-4%] h-[330px] w-[330px] rounded-full border border-[#F2EFE8]/10" />
+        <div className="relative mx-auto grid max-w-[1500px] gap-12 md:grid-cols-[.8fr_1.2fr] md:items-end">
+          <div>
+            <p className="font-mono text-[9px] tracking-[.25em] text-[#B65B3C]">THE RULE</p>
+            <h2 className="mt-5 font-display text-6xl font-semibold uppercase leading-[.8] tracking-[-.06em] md:text-9xl">DON'T<br />JUST<br /><span className="text-[#B65B3C]">LOOK.</span></h2>
           </div>
-          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#B65B3C]">AyuuWorks Brain</p>
-              <h2 className="mt-3 max-w-4xl font-display text-4xl font-semibold uppercase leading-none tracking-[-0.05em] md:text-6xl">
-                FACT PEHLE.<br />INTERPRETATION BAAD MEIN.
-              </h2>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-[#514c45]">
-                Casebook ka rule simple hai: jo documented hai usko fact bolenge.
-                Jo hum infer karte hain, usko clearly AyuuWorks take bolenge.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 border border-[#111111]/20 px-4 py-3 text-[10px] uppercase tracking-[0.16em]">
-              <Search className="h-4 w-4" />
-              Evidence-first
+          <div>
+            <p className="max-w-2xl font-display text-3xl leading-[1] md:text-5xl">Ask what made the idea travel.</p>
+            <div className="mt-10 grid gap-px bg-[#F2EFE8]/15 md:grid-cols-3">
+              {[
+                ['01', 'FACT', 'What actually happened?'],
+                ['02', 'CLUE', 'What detail keeps showing up?'],
+                ['03', 'TAKE', 'What can we learn without pretending certainty?']
+              ].map(([n, title, text]) => (
+                <div key={n} className="bg-[#111] p-5">
+                  <span className="font-mono text-[8px] text-[#B65B3C]">{n}</span>
+                  <h3 className="mt-10 font-display text-xl uppercase">{title}</h3>
+                  <p className="mt-2 text-xs leading-5 text-[#A9A29A]">{text}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
-      {activeMedia && <MediaLightbox media={activeMedia} onClose={() => setActiveMedia(null)} />}
-      {explorerOpen && <BusinessExplorer savedClues={saved.length} onClose={() => setExplorerOpen(false)} />}
-      {brainOpen && <BrainPanel clues={saved} onClose={() => setBrainOpen(false)} />}
-      {caseboardOpen && <Caseboard clues={saved} onRemove={(id) => setSaved((current) => current.filter((item) => item.id !== id))} onClose={() => setCaseboardOpen(false)} />}
-      <SoundControl mode={soundMode} onModeChange={(mode) => { setSoundMode(mode); playSound('paper'); }} />
-      <button onClick={() => { playSound('brain'); setBrainOpen(true); }} className="fixed bottom-5 right-[150px] z-40 inline-flex items-center gap-2 border border-[#B65B3C] bg-[#111111] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#F2EFE8] shadow-lg hover:bg-[#B65B3C]"><Sparkles className="h-3.5 w-3.5" /> BRAIN</button>
-      <button onClick={() => window.dispatchEvent(new Event("open-caseboard"))} className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 border border-[#111111]/20 bg-[#F2EFE8] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.16em] shadow-lg hover:border-[#B65B3C]"><Bookmark className="h-3.5 w-3.5" fill={saved.length ? "currentColor" : "none"} /> CASEBOARD {saved.length ? ` / ${saved.length}` : ""}</button>
+
+      <VisualDiscovery savedIds={visualSaved} onSave={(item: InspirationItem) => {
+        playSound('pin');
+        setVisualSaved((current) => current.includes(item.id) ? current : [...current, item.id]);
+      }} />
+
+      <section className="mx-auto max-w-[1500px] px-5 py-20 md:px-10 md:py-28">
+        <div className="grid gap-10 border-y border-[#111]/15 py-10 md:grid-cols-[1fr_.75fr] md:items-center">
+          <div>
+            <p className="font-mono text-[9px] tracking-[.25em] text-[#B65B3C]">YOUR TRAIL / {saved.length} CLUES</p>
+            <h2 className="mt-4 max-w-4xl font-display text-5xl font-semibold uppercase leading-[.84] tracking-[-.055em] md:text-8xl">NOW MAKE<br />THE CONNECTION.</h2>
+            <p className="mt-6 max-w-2xl text-sm leading-7 text-[#514c45]">
+              Casebook ka point answers dena nahi tha. Point tha tumhe notice karna sikhana. Ab apne business par wahi lens lagao.
+            </p>
+          </div>
+          <div className="grid gap-2">
+            <button onClick={() => setCaseboardOpen(true)} className="flex items-center justify-between border border-[#111]/15 bg-[#E8E3DA] p-5 text-left transition hover:border-[#B65B3C]">
+              <span><span className="block font-mono text-[8px] text-[#B65B3C]">YOUR CLUES</span><span className="mt-2 block font-display text-2xl uppercase">OPEN CASEBOARD</span></span>
+              <Bookmark className="h-5 w-5" />
+            </button>
+            <button onClick={() => setBrainOpen(true)} disabled={saved.length < 2} className="flex items-center justify-between border border-[#111]/15 p-5 text-left transition enabled:hover:border-[#B65B3C] disabled:cursor-not-allowed disabled:opacity-40">
+              <span><span className="block font-mono text-[8px] text-[#B65B3C]">PATTERN LAYER</span><span className="mt-2 block font-display text-2xl uppercase">SEE WHAT CONNECTS</span></span>
+              <Search className="h-5 w-5" />
+            </button>
+            <button onClick={() => setExplorerOpen(true)} className="flex items-center justify-between bg-[#B65B3C] p-5 text-left text-[#F2EFE8] transition hover:bg-[#9F4D31]">
+              <span><span className="block font-mono text-[8px] text-[#F2EFE8]/70">NEXT / YOUR BUSINESS</span><span className="mt-2 block font-display text-2xl uppercase">LOOK AT YOUR BUSINESS</span></span>
+              <ArrowRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div className="fixed bottom-5 left-5 z-40 flex items-center gap-2">
+        <SoundControl mode={soundMode} onChange={setSoundMode} />
+        <button onClick={() => setCaseboardOpen(true)} className="flex items-center gap-2 border border-[#111]/15 bg-[#F2EFE8]/90 px-3 py-2 text-[8px] font-semibold uppercase tracking-[.14em] backdrop-blur-md">
+          <Bookmark className="h-3 w-3" /> {saved.length} CLUES
+        </button>
+      </div>
+
       {activeCase && (
-        <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#111111]/95 p-4 md:p-8" role="dialog" aria-modal="true">
-          <div className="mx-auto max-w-6xl border border-[#F2EFE8]/15 bg-[#F2EFE8] text-[#111111]">
-            <div className="flex items-center justify-between border-b border-[#111111]/15 p-4 md:p-6">
-              <div>
-                <p className="font-mono text-[9px] tracking-[0.22em] text-[#B65B3C]">CASE / {activeCase.number} / INVESTIGATION DESK</p>
-                <p className="mt-2 text-xs uppercase tracking-[0.16em]">{activeCase.field}</p>
-              </div>
-              <button onClick={() => setActiveCase(null)} aria-label="Close case" className="border border-[#111111]/15 p-2 hover:border-[#B65B3C]"><X className="h-4 w-4" /></button>
+        <CaseModal
+          item={activeCase}
+          saved={saved}
+          onPin={(clue, id) => pin(activeCase, clue, id)}
+          onMedia={(media) => { playSound('media'); setActiveMedia(media); }}
+          onClose={() => setActiveCase(null)}
+        />
+      )}
+
+      {activeMedia && <MediaLightbox media={activeMedia} onClose={() => setActiveMedia(null)} />}
+      {caseboardOpen && <Caseboard clues={saved} onRemove={(id) => setSaved((current) => current.filter((item) => item.id !== id))} onClose={() => setCaseboardOpen(false)} />}
+      {brainOpen && <BrainPanel clues={saved} onClose={() => setBrainOpen(false)} />}
+      {explorerOpen && <BusinessExplorer onClose={() => setExplorerOpen(false)} savedClues={saved.length} onStartProject={startProject} />}
+
+      {projectBriefOpen && (
+        <div className="fixed inset-0 z-[110] grid place-items-center bg-[#111]/90 p-5" role="dialog" aria-modal="true">
+          <div className="w-full max-w-2xl border border-[#F2EFE8]/15 bg-[#F2EFE8] p-6 text-[#111] md:p-9">
+            <div className="flex items-start justify-between">
+              <div><p className="font-mono text-[9px] tracking-[.2em] text-[#B65B3C]">CASEBOOK → PROJECT</p><h2 className="mt-3 font-display text-4xl uppercase leading-[.85] md:text-6xl">YOUR TRAIL<br />IS READY.</h2></div>
+              <button onClick={() => setProjectBriefOpen(false)} className="border border-[#111]/15 p-2"><X className="h-4 w-4" /></button>
             </div>
-            <div className="grid gap-10 p-5 md:grid-cols-[1fr_0.8fr] md:p-10">
-              <div>
-                <p className="font-mono text-[9px] tracking-[0.2em] text-[#B65B3C]">CASE FILE</p>
-                <h2 className="mt-3 font-display text-4xl font-semibold uppercase leading-[0.9] tracking-[-0.05em] md:text-7xl">{activeCase.title}</h2>
-                <p className="mt-6 max-w-2xl text-base leading-7 text-[#514c45]">{activeCase.summary}</p>
-                <div className="mt-10">
-                  <p className="font-mono text-[9px] tracking-[0.2em] text-[#B65B3C]">EVIDENCE</p>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    {activeCase.media.map((media) => (
-                      <button key={media.title} onClick={() => setActiveMedia(media)} className="text-left"><MediaEvidence media={media} compact /></button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div className="border-l border-[#111111]/15 pl-0 md:pl-8">
-                <p className="font-mono text-[9px] tracking-[0.2em] text-[#B65B3C]">INVESTIGATION</p>
-                <p className="mt-3 text-sm leading-6 text-[#5b574f]">Pehle facts. Phir clues. Phir sawaal. Verdict nahi, understanding.</p>
-                <div className="mt-7 space-y-3">
-                  {activeCase.investigation.facts.map((fact, i) => (
-                    <div key={fact} className="border border-[#111111]/15 bg-[#ebe7df] p-4">
-                      <p className="font-mono text-[8px] tracking-[0.16em] text-[#6b665d]">FACT / 0{i + 1}</p>
-                      <p className="mt-2 text-sm leading-6">{fact}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-7">
-                  <p className="font-mono text-[9px] tracking-[0.2em] text-[#B65B3C]">CLUES</p>
-                  <div className="mt-3 space-y-2">
-                    {activeCase.investigation.clues.map((clue, i) => {
-                      const key = activeCase.id + '-clue-' + i;
-                      const open = revealed.includes(key);
-                      return (
-                        <button key={key} onClick={() => reveal(key)} className="w-full border border-[#111111]/15 p-4 text-left hover:border-[#B65B3C]">
-                          <div className="flex items-center gap-3">
-                            {open ? <Check className="h-4 w-4 text-[#B65B3C]" /> : <LockKeyhole className="h-4 w-4 opacity-50" />}
-                            <span className="font-mono text-[9px] tracking-[0.16em]">CLUE / 0{i + 1}</span>
-                          </div>
-                          {open ? <><p className="mt-3 text-sm leading-6">{clue}</p><span onClick={(event) => { event.stopPropagation(); saveDiscoveredClue(activeCase, clue, i); }} className="mt-4 inline-flex cursor-pointer items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#B65B3C]">SAVE THIS CLUE →</span></> : <p className="mt-3 text-xs uppercase tracking-[0.12em] text-[#6b665d]">Click karke clue kholo</p>}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div className="mt-7 border-l-2 border-[#B65B3C] bg-[#ebe7df] p-5">
-                  <p className="font-mono text-[9px] tracking-[0.18em] text-[#B65B3C]">QUESTIONS TO INVESTIGATE</p>
-                  <div className="mt-3 space-y-3">
-                    {activeCase.investigation.questions.map((question) => <p key={question} className="text-sm leading-6">“{question}”</p>)}
-                  </div>
-                </div>
-                {activeCase.investigation.clues.every((_, i) => revealed.includes(activeCase.id + '-clue-' + i)) && (
-                  <div className="mt-7 border border-[#B65B3C] bg-[#111111] p-5 text-[#F2EFE8]">
-                    <p className="font-mono text-[9px] tracking-[0.18em] text-[#B65B3C]">CASE STATUS</p>
-                    <p className="mt-2 font-display text-2xl font-semibold uppercase">CLUES CONNECTED.</p>
-                    <p className="mt-3 text-sm leading-6 text-[#D7D0C5]">{activeCase.investigation.takeaway}</p>
-                    <p className="mt-4 font-mono text-[8px] uppercase tracking-[0.16em] text-[#9B978F]">AYUUWORKS INTERPRETATION / NOT A FACTUAL CLAIM</p>
-                  </div>
-                )}
-              </div>
+            <div className="mt-8 grid gap-3 md:grid-cols-3">
+              <Stat label="CLUES" value={String(saved.length)} />
+              <Stat label="VISUALS" value={String(visualSaved.length)} />
+              <Stat label="BUSINESS" value={projectContext.businessName || projectContext.businessType} />
             </div>
+            <div className="mt-6 border-l-2 border-[#B65B3C] bg-[#E8E3DA] p-5 text-sm leading-6">Investigation trail saved. Next step: turn the questions into a real project conversation.</div>
+            <button onClick={handoffProject} className="mt-6 flex w-full items-center justify-between bg-[#111] p-5 text-[#F2EFE8]"><span className="font-mono text-[9px] tracking-[.16em]">CONTINUE TO PROJECT BRIEF</span><ArrowRight className="h-4 w-4" /></button>
           </div>
         </div>
       )}
     </main>
   );
 };
+
+const Stat: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+  <div className="border border-[#111]/15 p-4"><p className="font-mono text-[8px] tracking-[.16em] text-[#B65B3C]">{label}</p><p className="mt-2 truncate font-display text-2xl uppercase">{value}</p></div>
+);
+
+const CaseModal: React.FC<{
+  item: CaseFile;
+  saved: SavedClue[];
+  onPin: (clue: string, id: string) => void;
+  onMedia: (media: CaseMedia) => void;
+  onClose: () => void;
+}> = ({ item, saved, onPin, onMedia, onClose }) => {
+  const [tab, setTab] = useState<'story' | 'evidence' | 'investigation'>('story');
+  const pinnedMain = saved.some((entry) => entry.id === item.id + '-main-clue');
+
+  return (
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#111]/95 p-4 md:p-8" role="dialog" aria-modal="true">
+      <div className="mx-auto max-w-7xl overflow-hidden border border-[#F2EFE8]/15 bg-[#F2EFE8] text-[#111]">
+        <header className="flex items-center justify-between border-b border-[#111]/15 p-5 md:p-7">
+          <div><p className="font-mono text-[9px] tracking-[.2em] text-[#B65B3C]">CASE / {item.number} · {item.field}</p><h2 className="mt-2 max-w-5xl font-display text-4xl font-semibold uppercase leading-[.86] tracking-[-.045em] md:text-6xl">{item.title}</h2></div>
+          <button onClick={onClose} className="shrink-0 border border-[#111]/15 p-2"><X className="h-4 w-4" /></button>
+        </header>
+
+        <div className="grid gap-0 lg:grid-cols-[1.25fr_.75fr]">
+          <div className="border-b border-[#111]/15 p-5 md:p-8 lg:border-b-0 lg:border-r">
+            <div className="relative min-h-[380px] overflow-hidden bg-[#181817] md:min-h-[540px]">
+              <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 75% 25%,rgba(182,91,60,.72),transparent 22%),linear-gradient(145deg,#332f2b,#111 65%)' }} />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,rgba(0,0,0,.78))]" />
+              <div className="absolute inset-x-6 bottom-6 text-[#F2EFE8]">
+                <p className="font-mono text-[8px] tracking-[.2em] text-[#B65B3C]">{item.kicker}</p>
+                <p className="mt-3 max-w-3xl font-display text-4xl uppercase leading-[.85] md:text-6xl">{item.title}</p>
+              </div>
+            </div>
+            <div className="mt-5 flex gap-1 overflow-x-auto border-b border-[#111]/15">
+              {(['story','evidence','investigation'] as const).map((key) => <button key={key} onClick={() => setTab(key)} className={'shrink-0 px-4 py-3 font-mono text-[8px] tracking-[.15em] ' + (tab === key ? 'border-b-2 border-[#B65B3C] text-[#B65B3C]' : 'text-[#6B665D]')}>{key.toUpperCase()}</button>)}
+            </div>
+
+            {tab === 'story' && <div className="pt-6"><p className="text-base leading-8">{item.summary}</p><div className="mt-8 border-l-2 border-[#B65B3C] bg-[#E8E3DA] p-5"><p className="font-mono text-[8px] tracking-[.17em] text-[#B65B3C]">THE CLUE</p><p className="mt-3 font-display text-2xl uppercase leading-tight">{item.clue}</p></div></div>}
+
+            {tab === 'evidence' && <div className="grid gap-4 pt-6 md:grid-cols-2">{item.media.map((media, index) => <button key={media.title + index} onClick={() => onMedia(media)} className="text-left"><MediaEvidence media={media} /></button>)}</div>}
+
+            {tab === 'investigation' && (
+              <div className="grid gap-8 pt-6 md:grid-cols-2">
+                <InfoList title="FACTS" items={item.investigation.facts} />
+                <InfoList title="CLUES" items={item.investigation.clues} accent />
+                <InfoList title="QUESTIONS" items={item.investigation.questions} />
+                <div className="border border-[#B65B3C] bg-[#111] p-5 text-[#F2EFE8]"><p className="font-mono text-[8px] tracking-[.18em] text-[#B65B3C]">TAKEAWAY</p><p className="mt-3 font-display text-xl uppercase leading-tight">{item.investigation.takeaway}</p><p className="mt-4 text-[10px] leading-5 text-[#A9A29A]">AyuuWorks interpretation, not a factual claim.</p></div>
+              </div>
+            )}
+          </div>
+
+          <aside className="p-5 md:p-8">
+            <div className="border-b border-[#111]/15 pb-6">
+              <p className="font-mono text-[8px] tracking-[.18em] text-[#B65B3C]">RESEARCH TRAIL</p>
+              <div className="mt-4 space-y-2">{item.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer" className="flex items-center justify-between border border-[#111]/10 p-3 text-[9px] uppercase tracking-[.08em] hover:border-[#B65B3C]"><span>{source.type} / {source.name}</span><ExternalLink className="h-3 w-3 shrink-0 text-[#B65B3C]" /></a>)}</div>
+            </div>
+            <div className="pt-6">
+              <p className="font-mono text-[8px] tracking-[.18em] text-[#B65B3C]">PIN THIS CLUE</p>
+              <p className="mt-3 text-sm leading-6 text-[#514c45]">Keep this idea. When two or more clues connect, the Caseboard can surface a pattern.</p>
+              <button onClick={() => onPin(item.clue, item.id + '-main-clue')} className={'mt-5 flex w-full items-center justify-between border p-4 text-[9px] font-semibold uppercase tracking-[.15em] ' + (pinnedMain ? 'border-[#B65B3C] bg-[#B65B3C]/10 text-[#B65B3C]' : 'border-[#111]/15 hover:border-[#B65B3C]')}><span>{pinnedMain ? 'CLUE PINNED' : 'PIN CLUE'}</span>{pinnedMain ? <Check className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}</button>
+            </div>
+            <div className="mt-8 border-t border-[#111]/15 pt-6">
+              <p className="font-mono text-[8px] tracking-[.18em] text-[#6B665D]">CASE STATUS</p>
+              <div className="mt-3 flex items-center gap-3"><span className="h-2 w-2 rounded-full bg-[#B65B3C]" /><span className="font-display text-xl uppercase">{item.status}</span></div>
+              <p className="mt-2 text-xs leading-5 text-[#6B665D]">{item.year} · {item.region}</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const InfoList: React.FC<{ title: string; items: string[]; accent?: boolean }> = ({ title, items, accent }) => (
+  <div><p className={'font-mono text-[8px] tracking-[.18em] ' + (accent ? 'text-[#B65B3C]' : 'text-[#6B665D]')}>{title}</p><div className="mt-3 space-y-2">{items.map((text, index) => <div key={index} className="border-l border-[#111]/15 bg-[#E8E3DA] p-4 text-sm leading-6">{text}</div>)}</div></div>
+);
