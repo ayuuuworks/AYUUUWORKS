@@ -23,6 +23,7 @@ import { AboutScene } from './scenes/AboutScene';
 import { Footer } from './components/Footer';
 import { ChallengeModal } from './components/ChallengeModal';
 import { ProjectModal } from './components/ProjectModal';
+import { CasebookPage } from './pages/CasebookPage';
 
 // Register ScrollTrigger plugin with GSAP
 gsap.registerPlugin(ScrollTrigger);
@@ -185,6 +186,19 @@ function MainExperience() {
 }
 
 export default function App() {
+  const path = window.location.pathname.replace(/\\/$/, '') || '/';
+
+  if (path === '/casebook') {
+    return (
+      <AWEProvider>
+        <div className="min-h-screen bg-[#F2EFE8] text-[#111111] font-sans selection:bg-[#B65B3C] selection:text-[#F2EFE8]">
+          <Navigation />
+          <CasebookPage />
+        </div>
+      </AWEProvider>
+    );
+  }
+
   return (
     <AWEProvider>
       <div className="min-h-screen bg-[#111111] text-[#F2EFE8] flex flex-col font-sans selection:bg-[#B65B3C] selection:text-[#F2EFE8]">
