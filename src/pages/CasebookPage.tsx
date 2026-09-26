@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowUpRight, Bookmark, Camera, FileText, Play, Search, Sparkles } from 'lucide-react';
 import { caseFiles, caseFilters } from '../casebook/data/cases';
+import { MediaEvidence } from '../casebook/components/MediaEvidence';
+import { MediaLightbox } from '../casebook/components/MediaLightbox';
 
 const evidence = [
   { label: 'EVIDENCE', title: 'REAL CAMPAIGNS', text: 'Ads, launches aur brand moments jo actually duniya ne dekhe.', icon: Camera },
@@ -12,6 +14,7 @@ const evidence = [
 export const CasebookPage: React.FC = () => {
   const [filter, setFilter] = useState<(typeof caseFilters)[number]>('ALL');
   const [saved, setSaved] = useState<string[]>([]);
+  const [activeMedia, setActiveMedia] = useState<import('../casebook/data/cases').CaseMedia | null>(null);
 
   const visibleCases = useMemo(
     () => filter === 'ALL' ? caseFiles : caseFiles.filter((item) => item.type === filter),
@@ -111,22 +114,12 @@ export const CasebookPage: React.FC = () => {
                   <span className="text-[9px] font-semibold tracking-[0.16em] text-[#B65B3C]">{item.status}</span>
                 </div>
 
-                <div className={`my-5 relative overflow-hidden bg-[#22211f] ${index % 3 === 0 ? 'aspect-[4/5]' : index % 3 === 1 ? 'aspect-[16/10]' : 'aspect-square'}`}>
-                  <div className="absolute inset-0 opacity-30" style={{
-                    backgroundImage: 'radial-gradient(circle at 30% 20%, #d7d0c5 0 1px, transparent 1px), linear-gradient(135deg, #242424, #111111)',
-                    backgroundSize: '14px 14px, 100% 100%',
-                  }} />
-                  <div className="absolute inset-0 flex items-center justify-center p-8 text-center">
-                    <div>
-                      <p className="font-mono text-[9px] tracking-[0.25em] text-[#D7D0C5]">MEDIA EVIDENCE / STAGE 01</p>
-                      <p className="mt-3 font-display text-2xl font-semibold uppercase leading-none text-[#F2EFE8]">
-                        REAL MEDIA<br />ENTERS NEXT.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="absolute bottom-3 left-3 border border-[#D7D0C5]/30 px-2 py-1 text-[8px] tracking-[0.18em] text-[#D7D0C5]">
-                    PLACEHOLDER / NO FAKE ASSET
-                  </div>
+                <div className="my-5 grid gap-3">
+                  {item.media.slice(0, 2).map((media) => (
+                    <button key={media.title} onClick={() => setActiveMedia(media)} className="text-left" aria-label={`Open ${media.title}`}>
+                      <MediaEvidence media={media} compact />
+                    </button>
+                  ))}
                 </div>
 
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#B65B3C]">{item.kicker}</p>
@@ -177,6 +170,7 @@ export const CasebookPage: React.FC = () => {
           </div>
         </div>
       </section>
+      {activeMedia && <MediaLightbox media={activeMedia} onClose={() => setActiveMedia(null)} />}
     </main>
   );
 };
