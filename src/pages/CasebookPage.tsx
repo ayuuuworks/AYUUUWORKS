@@ -4,6 +4,7 @@ import { caseFiles, caseFilters } from '../casebook/data/cases';
 import { MediaEvidence } from '../casebook/components/MediaEvidence';
 import { MediaLightbox } from '../casebook/components/MediaLightbox';
 import { Caseboard, SavedClue } from '../casebook/components/Caseboard';
+import { BrainPanel } from '../casebook/components/BrainPanel';
 
 const evidence = [
   { label: 'EVIDENCE', title: 'REAL CAMPAIGNS', text: 'Ads, launches aur brand moments jo actually duniya ne dekhe.', icon: Camera },
@@ -21,6 +22,7 @@ export const CasebookPage: React.FC = () => {
   const [activeCase, setActiveCase] = useState<(typeof caseFiles)[number] | null>(null);
   const [revealed, setRevealed] = useState<string[]>([]);
   const [caseboardOpen, setCaseboardOpen] = useState(false);
+  const [brainOpen, setBrainOpen] = useState(false);
 
 
   const visibleCases = useMemo(
@@ -191,7 +193,9 @@ export const CasebookPage: React.FC = () => {
         </div>
       </section>
       {activeMedia && <MediaLightbox media={activeMedia} onClose={() => setActiveMedia(null)} />}
+      {brainOpen && <BrainPanel clues={saved} onClose={() => setBrainOpen(false)} />}
       {caseboardOpen && <Caseboard clues={saved} onRemove={(id) => setSaved((current) => current.filter((item) => item.id !== id))} onClose={() => setCaseboardOpen(false)} />}
+      <button onClick={() => setBrainOpen(true)} className="fixed bottom-5 right-[150px] z-40 inline-flex items-center gap-2 border border-[#B65B3C] bg-[#111111] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#F2EFE8] shadow-lg hover:bg-[#B65B3C]"><Sparkles className="h-3.5 w-3.5" /> BRAIN</button>
       <button onClick={() => window.dispatchEvent(new Event("open-caseboard"))} className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 border border-[#111111]/20 bg-[#F2EFE8] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.16em] shadow-lg hover:border-[#B65B3C]"><Bookmark className="h-3.5 w-3.5" fill={saved.length ? "currentColor" : "none"} /> CASEBOARD {saved.length ? ` / ${saved.length}` : ""}</button>
       {activeCase && (
         <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#111111]/95 p-4 md:p-8" role="dialog" aria-modal="true">
