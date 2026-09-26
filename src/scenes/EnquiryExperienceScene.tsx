@@ -6,7 +6,19 @@ export const EnquiryExperienceScene: React.FC = () => {
   const { session, trackEvent, isReducedMotion } = useAWE();
 
   const [formOpen, setFormOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => {
+    try {
+      const handoff = JSON.parse(localStorage.getItem('ayuuworks-project-handoff') || 'null');
+      if (handoff) return {
+        name: '', businessName: handoff.businessName || session.businessName || '',
+        businessType: handoff.businessType || session.industry || 'Physical / Local Business',
+        mainChallenge: 'Investigate positioning, experience and conversion.',
+        helpNeeded: session.diagnosis?.relevant_services?.[0] || 'Brand Identity & Flagship Website',
+        budgetRange: 'To be determined following diagnosis', timeline: 'Immediate (Next 1–2 months)', contact: '',
+        additionalContext: 'Casebook trail: ' + (handoff.savedClues || 0) + ' saved clues, ' + (handoff.visualReferences || 0) + ' visual references. Started from Casebook investigation.',
+      };
+    } catch {}
+    return {
     name: '',
     businessName: session.businessName || '',
     businessType: session.industry || 'Physical / Local Business',
@@ -16,6 +28,7 @@ export const EnquiryExperienceScene: React.FC = () => {
     timeline: 'Next 1–2 months',
     contact: '',
     additionalContext: '',
+    };
   });
 
   const [submitted, setSubmitted] = useState(false);
