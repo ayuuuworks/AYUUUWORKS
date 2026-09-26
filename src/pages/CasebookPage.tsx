@@ -250,7 +250,7 @@ export const CasebookPage: React.FC = () => {
       </section>
 
       <div className="fixed bottom-5 left-5 z-40 flex items-center gap-2">
-        <SoundControl mode={soundMode} onChange={setSoundMode} />
+        <SoundControl mode={soundMode} onModeChange={setSoundMode} />
         <button onClick={() => setCaseboardOpen(true)} className="flex items-center gap-2 border border-[#111]/15 bg-[#F2EFE8]/90 px-3 py-2 text-[8px] font-semibold uppercase tracking-[.14em] backdrop-blur-md">
           <Bookmark className="h-3 w-3" /> {saved.length} CLUES
         </button>
