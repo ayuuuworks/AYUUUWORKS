@@ -5,6 +5,7 @@ import { MediaEvidence } from '../casebook/components/MediaEvidence';
 import { MediaLightbox } from '../casebook/components/MediaLightbox';
 import { Caseboard, SavedClue } from '../casebook/components/Caseboard';
 import { BrainPanel } from '../casebook/components/BrainPanel';
+import { BusinessExplorer } from '../casebook/components/BusinessExplorer';
 
 const evidence = [
   { label: 'EVIDENCE', title: 'REAL CAMPAIGNS', text: 'Ads, launches aur brand moments jo actually duniya ne dekhe.', icon: Camera },
@@ -23,6 +24,7 @@ export const CasebookPage: React.FC = () => {
   const [revealed, setRevealed] = useState<string[]>([]);
   const [caseboardOpen, setCaseboardOpen] = useState(false);
   const [brainOpen, setBrainOpen] = useState(false);
+  const [explorerOpen, setExplorerOpen] = useState(false);
 
 
   const visibleCases = useMemo(
@@ -174,6 +176,16 @@ export const CasebookPage: React.FC = () => {
         </div>
 
         <div className="mt-20 border-t border-[#111111]/20 pt-8">
+          <div className="mt-10 border border-[#111111]/20 bg-[#111111] p-6 text-[#F2EFE8] md:p-8">
+            <p className="font-mono text-[9px] tracking-[0.2em] text-[#B65B3C]">NEXT INVESTIGATION</p>
+            <div className="mt-3 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h3 className="font-display text-3xl font-semibold uppercase tracking-[-0.04em] md:text-5xl">AB YEHI LENS APNE BUSINESS PE LAGAO.</h3>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#D7D0C5]">Casebook se nikle clues ko apne business context mein test karo. 30 seconds. No score.</p>
+              </div>
+              <button onClick={() => setExplorerOpen(true)} className="inline-flex shrink-0 items-center justify-center gap-3 border border-[#B65B3C] px-5 py-4 text-[10px] font-semibold uppercase tracking-[0.18em] hover:bg-[#B65B3C]">OPEN MY CASE <ArrowUpRight className="h-4 w-4" /></button>
+            </div>
+          </div>
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#B65B3C]">AyuuWorks Brain</p>
@@ -193,6 +205,7 @@ export const CasebookPage: React.FC = () => {
         </div>
       </section>
       {activeMedia && <MediaLightbox media={activeMedia} onClose={() => setActiveMedia(null)} />}
+      {explorerOpen && <BusinessExplorer savedClues={saved.length} onClose={() => setExplorerOpen(false)} />}
       {brainOpen && <BrainPanel clues={saved} onClose={() => setBrainOpen(false)} />}
       {caseboardOpen && <Caseboard clues={saved} onRemove={(id) => setSaved((current) => current.filter((item) => item.id !== id))} onClose={() => setCaseboardOpen(false)} />}
       <button onClick={() => setBrainOpen(true)} className="fixed bottom-5 right-[150px] z-40 inline-flex items-center gap-2 border border-[#B65B3C] bg-[#111111] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#F2EFE8] shadow-lg hover:bg-[#B65B3C]"><Sparkles className="h-3.5 w-3.5" /> BRAIN</button>
