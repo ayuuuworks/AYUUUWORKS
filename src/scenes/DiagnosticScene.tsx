@@ -82,7 +82,7 @@ export const DiagnosticScene: React.FC = () => {
         investigateOrder: ['PERCEPTION', 'TRUST', 'ACTION', 'ATTENTION'],
         why: 'When prospective clients encounter low-contrast or template-like touchpoints, they subconsciously downgrade their price expectation before speaking with you.',
         capability: 'Bespoke Brand Identity & Editorial Digital Flagship',
-        targetProject: 'the-grand-haveli',
+        targetProject: '',
       };
     }
     if (selectedGoal === 'Get more enquiries' || selectedGoal === 'Improve website') {
@@ -92,7 +92,7 @@ export const DiagnosticScene: React.FC = () => {
         investigateOrder: ['ACTION', 'TRUST', 'PERCEPTION', 'ATTENTION'],
         why: 'High-ticket buyers do not fill out cold 8-field forms. They seek prompt reassurance, clear occasion curation, and frictionless private contact.',
         capability: 'Conversion Experience Architecture & VIP Concierge Systems',
-        targetProject: 'saanjh',
+        targetProject: '',
       };
     }
     if (selectedGoal === 'Get noticed' || selectedGoal === 'Improve social presence') {
@@ -102,7 +102,7 @@ export const DiagnosticScene: React.FC = () => {
         investigateOrder: ['ATTENTION', 'PERCEPTION', 'TRUST', 'ACTION'],
         why: 'In modern markets, attention is not won by posting louder; it is earned by being culturally unmistakable and visually disciplined.',
         capability: 'Strategic Brand Positioning & 9-Grid Content Architecture',
-        targetProject: 'veda-living',
+        targetProject: '',
       };
     }
     // Default
@@ -112,7 +112,7 @@ export const DiagnosticScene: React.FC = () => {
       investigateOrder: ['PERCEPTION', 'TRUST', 'ACTION', 'ATTENTION'],
       why: 'Clients must believe in your operational authority and standard before taking decisive action.',
       capability: 'Integrated Brand & Experience Architecture',
-      targetProject: 'rooh-gastronomy',
+      targetProject: '',
     };
   };
 
@@ -128,15 +128,15 @@ export const DiagnosticScene: React.FC = () => {
       {/* Editorial Header */}
       <div className="max-w-3xl mb-12">
         <div className="flex items-center gap-2 text-xs font-mono tracking-widest text-[#B65B3C] uppercase mb-3">
-          <span>EXPLORER · 03</span>
+          <span>A CLOSER LOOK</span>
           <span>·</span>
-          <span>30–60 SECOND STRATEGIC ASSESSMENT</span>
+          <span>A SMALL QUESTION</span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-black font-display text-[#F2EFE8] tracking-tight leading-tight">
-          SEE YOUR BUSINESS DIFFERENTLY.
+          LET'S LOOK AT YOUR BUSINESS.
         </h2>
         <p className="text-base text-[#9B978F] mt-3 leading-relaxed">
-          Tell us about what you are building. We'll generate a cautious hypothesis about what might deserve attention first.
+          Give us two small clues. We'll show you a place worth looking first.
         </p>
       </div>
 
@@ -165,7 +165,7 @@ export const DiagnosticScene: React.FC = () => {
           <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center text-[10px]">
             2
           </span>
-          <span>PRIMARY OBJECTIVE</span>
+          <span>WHAT MATTERS RIGHT NOW</span>
         </button>
 
         <span className="text-[#242424]">/</span>
@@ -179,19 +179,19 @@ export const DiagnosticScene: React.FC = () => {
           <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center text-[10px]">
             3
           </span>
-          <span>WHAT WE HEARD & SUGGEST</span>
+          <span>WHAT WE FOUND</span>
         </button>
       </div>
 
-      {/* STEP 01: WHAT KIND OF BUSINESS ARE YOU BUILDING? */}
+      {/* STEP 01: WHAT ARE YOU BUILDING? */}
       {currentStep === 1 && (
         <div className="space-y-6 max-w-3xl">
           <div>
             <h3 className="text-xl sm:text-2xl font-bold font-display text-[#F2EFE8]">
-              WHAT KIND OF BUSINESS ARE YOU BUILDING?
+              WHAT ARE YOU BUILDING?
             </h3>
             <p className="text-xs text-[#9B978F] mt-1">
-              Select the option that best reflects your current commercial operation.
+              Just pick the closest fit.
             </p>
           </div>
 
@@ -231,15 +231,15 @@ export const DiagnosticScene: React.FC = () => {
         </div>
       )}
 
-      {/* STEP 02: WHAT ARE YOU TRYING TO IMPROVE? */}
+      {/* STEP 02: WHAT DO YOU WANT PEOPLE TO NOTICE? */}
       {currentStep === 2 && (
         <div className="space-y-6 max-w-3xl">
           <div>
             <h3 className="text-xl sm:text-2xl font-bold font-display text-[#F2EFE8]">
-              WHAT ARE YOU TRYING TO IMPROVE?
+              WHAT DO YOU WANT PEOPLE TO NOTICE?
             </h3>
             <p className="text-xs text-[#9B978F] mt-1">
-              Select the primary friction or priority for your business right now.
+              Choose whatever feels closest. There is no wrong answer.
             </p>
           </div>
 
@@ -282,7 +282,7 @@ export const DiagnosticScene: React.FC = () => {
           <div className="p-6 rounded border border-[#242424] bg-[#141414] space-y-4">
             <div className="flex items-center justify-between border-b border-[#242424] pb-3">
               <span className="text-xs font-mono uppercase text-[#9B978F] tracking-widest">
-                WHAT WE HEARD
+                WHAT YOU TOLD US
               </span>
               <button
                 onClick={() => setCurrentStep(1)}
@@ -301,7 +301,7 @@ export const DiagnosticScene: React.FC = () => {
                 )}
               </div>
               <div>
-                <span className="text-[#9B978F] uppercase font-mono">PRIMARY OBJECTIVE</span>
+                <span className="text-[#9B978F] uppercase font-mono">WHAT MATTERS RIGHT NOW</span>
                 <p className="text-sm font-bold text-[#F2EFE8] mt-0.5">"{selectedGoal}"</p>
               </div>
             </div>
@@ -310,7 +310,7 @@ export const DiagnosticScene: React.FC = () => {
           {/* Section 13: What This May Suggest */}
           <div className="p-6 md:p-8 rounded border border-[#B65B3C]/50 bg-[#161413] space-y-4">
             <span className="text-xs font-mono uppercase text-[#B65B3C] tracking-widest font-bold">
-              WHAT THIS MAY SUGGEST
+              ONE POSSIBILITY
             </span>
             <p className="text-lg md:text-xl font-bold font-display text-[#F2EFE8] leading-snug">
               {fastHypothesis.summary}
@@ -323,7 +323,7 @@ export const DiagnosticScene: React.FC = () => {
           {/* Section 13: What We'd Investigate First */}
           <div className="p-6 rounded border border-[#242424] bg-[#141414] space-y-4">
             <span className="text-xs font-mono uppercase text-[#9B978F] tracking-widest">
-              WHAT WE'D INVESTIGATE FIRST
+              WHERE WE'D LOOK FIRST
             </span>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
@@ -353,17 +353,17 @@ export const DiagnosticScene: React.FC = () => {
             </div>
 
             <p className="text-xs text-[#9B978F] pt-2">
-              AyuuWorks maps your entire customer journey across these 4 interconnected systems rather than treating marketing in isolation.
+              This is only a starting point. The real picture comes from the business itself.
             </p>
           </div>
 
           {/* Section 13: See How We'd Approach This */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 rounded border border-[#242424] bg-[#161616]">
             <div>
-              <span className="text-[10px] font-mono text-[#B65B3C] uppercase">RECOMMENDED CAPABILITY</span>
+              <span className="text-[10px] font-mono text-[#B65B3C] uppercase">A PLACE TO START</span>
               <h4 className="text-base font-bold text-[#F2EFE8] mt-0.5">{fastHypothesis.capability}</h4>
               <p className="text-xs text-[#9B978F] mt-1">
-                Explore our approach and relevant case study.
+                If this feels familiar, keep exploring.
               </p>
             </div>
 
@@ -384,13 +384,13 @@ export const DiagnosticScene: React.FC = () => {
             >
               <div>
                 <span className="text-xs font-mono uppercase text-[#B65B3C] font-bold">
-                  DEEP MODE · OPTIONAL
+                  KEEP GOING · OPTIONAL
                 </span>
                 <h4 className="text-sm font-bold text-[#F2EFE8] mt-0.5">
-                  WANT A DEEPER STRATEGIC PERSPECTIVE?
+                  WANT TO GO A LITTLE DEEPER?
                 </h4>
                 <p className="text-xs text-[#9B978F]">
-                  Answer 2 additional questions to run the full AWE diagnosis with customized validation tests.
+                  Two more clues can make the picture clearer.
                 </p>
               </div>
 
@@ -437,7 +437,7 @@ export const DiagnosticScene: React.FC = () => {
 
                 <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <p className="text-xs text-[#9B978F]">
-                    Powered by AWE's transparent reasoning layer. Never fabricated.
+                    A starting point, not a verdict.
                   </p>
 
                   <button
@@ -450,7 +450,7 @@ export const DiagnosticScene: React.FC = () => {
                     ) : (
                       <>
                         <Sparkles className="w-3.5 h-3.5" />
-                        <span>GENERATE STRATEGY AUDIT</span>
+                        <span>SHOW ME WHAT YOU SEE</span>
                       </>
                     )}
                   </button>
@@ -460,7 +460,7 @@ export const DiagnosticScene: React.FC = () => {
                 {session.diagnosis && (
                   <div className="mt-6 pt-6 border-t border-[#242424] space-y-4">
                     <span className="text-xs font-mono uppercase text-[#B65B3C] tracking-widest font-bold">
-                      AWE STRATEGIC AUDIT REPORT
+                      WHAT WE FOUND
                     </span>
                     <div className="p-4 rounded bg-[#111111] border border-[#242424] text-xs text-[#D7D0C5] space-y-2">
                       <p className="font-bold text-[#F2EFE8] text-sm">
@@ -474,7 +474,7 @@ export const DiagnosticScene: React.FC = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                       <div className="p-4 rounded bg-[#111111] border border-[#242424] space-y-1">
                         <span className="font-mono text-[10px] text-[#B65B3C] uppercase block">
-                          POSSIBLE BOTTLENECKS
+                          POSSIBLE FRICTION
                         </span>
                         <ul className="list-disc list-inside text-[#D7D0C5] space-y-1">
                           {session.diagnosis.possible_bottlenecks.map((b, i) => (
@@ -485,7 +485,7 @@ export const DiagnosticScene: React.FC = () => {
 
                       <div className="p-4 rounded bg-[#111111] border border-[#242424] space-y-1">
                         <span className="font-mono text-[10px] text-[#D7D0C5] uppercase block">
-                          RECOMMENDED CORRECTIONS
+                          POSSIBLE NEXT MOVES
                         </span>
                         <ul className="list-disc list-inside text-[#D7D0C5] space-y-1">
                           {session.diagnosis.recommended_corrections.map((c, i) => (
