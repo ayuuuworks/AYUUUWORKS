@@ -3,7 +3,7 @@ import { ArrowRight, Building2, Check, X } from 'lucide-react';
 
 type BusinessType = 'PRODUCT' | 'SERVICE' | 'LOCAL' | 'DIGITAL';
 
-interface ExplorerProps { onClose: () => void; savedClues: number; }
+interface ExplorerProps { onClose: () => void; savedClues: number; onStartProject?: (payload: { businessType: BusinessType; businessName: string }) => void; }
 
 const options: { id: BusinessType; title: string; text: string }[] = [
   { id: 'PRODUCT', title: 'PRODUCT BUSINESS', text: 'Physical products, retail, D2C, fashion, jewellery, food products.' },
@@ -35,7 +35,7 @@ const hypotheses: Record<BusinessType, { title: string; body: string; questions:
   },
 };
 
-export const BusinessExplorer: React.FC<ExplorerProps> = ({ onClose, savedClues }) => {
+export const BusinessExplorer: React.FC<ExplorerProps> = ({ onClose, savedClues, onStartProject }) => {
   const [type, setType] = useState<BusinessType | null>(null);
   const [step, setStep] = useState<'intro' | 'type' | 'hypothesis'>('intro');
   const [name, setName] = useState('');
