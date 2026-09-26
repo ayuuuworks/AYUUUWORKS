@@ -34,6 +34,7 @@ const source = (name: string, usage: CaseMedia['usage'] = 'LINK'): CaseMedia => 
   title: 'Original source',
   description: 'Source placeholder. Add the verified publication or official campaign URL before publishing.',
   sourceName: name,
+  sourceUrl: undefined,
   credit: name,
   usage,
 });
