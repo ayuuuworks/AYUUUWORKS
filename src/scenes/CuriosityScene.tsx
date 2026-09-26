@@ -137,7 +137,7 @@ export const CuriosityScene: React.FC = () => {
                 ONE MORE THING.
               </span>
               <span className="text-xs font-mono text-[#9B978F]">
-                SYSTEM / {selected.system}
+                LOOK CLOSER
               </span>
             </div>
 
