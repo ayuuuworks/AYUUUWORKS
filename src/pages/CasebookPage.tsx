@@ -7,6 +7,7 @@ import { Caseboard, SavedClue } from '../casebook/components/Caseboard';
 import { BrainPanel } from '../casebook/components/BrainPanel';
 import { BusinessExplorer } from '../casebook/components/BusinessExplorer';
 import { SoundControl, SoundMode, useCasebookSound } from '../casebook/sound';
+import { VisualDiscovery, InspirationItem } from '../casebook/components/VisualDiscovery';
 
 const evidence = [
   { label: 'EVIDENCE', title: 'REAL CAMPAIGNS', text: 'Ads, launches aur brand moments jo actually duniya ne dekhe.', icon: Camera },
@@ -26,6 +27,7 @@ export const CasebookPage: React.FC = () => {
   const [caseboardOpen, setCaseboardOpen] = useState(false);
   const [brainOpen, setBrainOpen] = useState(false);
   const [explorerOpen, setExplorerOpen] = useState(false);
+  const [visualSaved, setVisualSaved] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem('ayuuworks-visual-trail') || '[]'); } catch { return []; } });
   const [soundMode, setSoundMode] = useState<SoundMode>(() => (localStorage.getItem('ayuuworks-casebook-sound') as SoundMode) || 'QUIET');
   const playSound = useCasebookSound(soundMode);
 
@@ -53,6 +55,8 @@ export const CasebookPage: React.FC = () => {
 
   React.useEffect(() => { localStorage.setItem('ayuuworks-caseboard', JSON.stringify(saved)); }, [saved]);
   React.useEffect(() => { localStorage.setItem('ayuuworks-casebook-sound', soundMode); }, [soundMode]);
+  React.useEffect(() => { localStorage.setItem('ayuuworks-visual-trail', JSON.stringify(visualSaved)); }, [visualSaved]);
+  const saveVisual = (item: InspirationItem) => { playSound('pin'); setVisualSaved((current) => current.includes(item.id) ? current : [...current, item.id]); };
   React.useEffect(() => { const open = () => setCaseboardOpen(true); window.addEventListener('open-caseboard', open); return () => window.removeEventListener('open-caseboard', open); }, []);
 
   return (
@@ -195,6 +199,8 @@ export const CasebookPage: React.FC = () => {
             );
           })}
         </div>
+
+        <VisualDiscovery savedIds={visualSaved} onSave={saveVisual} />
 
         <div className="mt-20 border-t border-[#111111]/20 pt-8">
           <div className="mt-10 border border-[#111111]/20 bg-[#111111] p-6 text-[#F2EFE8] md:p-8">
