@@ -1,0 +1,12 @@
+.casebook-page {
+  --case-paper: #f2efe8;
+  --case-ink: #111111;
+  --case-accent: #b65b3c;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .casebook-page * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
