@@ -26,6 +26,12 @@ export interface CaseFile {
   type: 'BRAND' | 'MARKETING' | 'DIGITAL' | 'CULTURE';
   featured?: boolean;
   media: CaseMedia[];
+  investigation: {
+    facts: string[];
+    clues: string[];
+    questions: string[];
+    takeaway: string;
+  };
 }
 
 const source = (name: string, usage: CaseMedia['usage'] = 'LINK'): CaseMedia => ({
@@ -51,6 +57,30 @@ export const caseFiles: CaseFile[] = [
     clue: 'Attention sirf campaign ka result nahi tha. Attention campaign ka hissa ban gaya.',
     type: 'MARKETING',
     featured: true,
+    investigation: {
+      facts: ['The campaign became widely discussed as advertising and entertainment overlapped.'],
+      clues: ['The creative idea gave people something to talk about beyond the product itself.'],
+      questions: ['Was attention designed into the idea?', 'What made the campaign feel shareable?'],
+      takeaway: 'Attention can become part of the creative system when the idea gives people a reason to pass it on.',
+    },
+    investigation: {
+      facts: ['Nike has built a long-running brand identity around sport, performance and cultural storytelling.'],
+      clues: ['The product is repeatedly framed inside a larger point of view.'],
+      questions: ['What does the audience feel they are joining?', 'Where does identity appear beyond the logo?'],
+      takeaway: 'A strong identity can make the product feel like evidence of belonging to a point of view.',
+    },
+    investigation: {
+      facts: ['Zomato has used a recognizable social voice as part of its public-facing brand communication.'],
+      clues: ['Tone and timing can make routine brand posts feel native to the platform.'],
+      questions: ['What makes a brand voice recognizable?', 'Where does consistency matter most?'],
+      takeaway: 'Brand personality can live in language, not only in visual identity.',
+    },
+    investigation: {
+      facts: ['Netflix has evolved its product and business model over time as viewing habits and technology changed.'],
+      clues: ['Business models can be redesigned around changing customer behaviour.'],
+      questions: ['Which customer habit changed?', 'What had to change with it?'],
+      takeaway: 'Sometimes the strategic move is not a better version of the old system, but a new system.',
+    },
     media: [
       source('Official campaign source', 'LINK'),
       {
