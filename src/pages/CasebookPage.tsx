@@ -28,6 +28,8 @@ export const CasebookPage: React.FC = () => {
   const [brainOpen, setBrainOpen] = useState(false);
   const [explorerOpen, setExplorerOpen] = useState(false);
   const [visualSaved, setVisualSaved] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem('ayuuworks-visual-trail') || '[]'); } catch { return []; } });
+  const [projectBriefOpen, setProjectBriefOpen] = useState(false);
+  const [projectContext, setProjectContext] = useState({ businessType: '', businessName: '' });
   const [soundMode, setSoundMode] = useState<SoundMode>(() => (localStorage.getItem('ayuuworks-casebook-sound') as SoundMode) || 'QUIET');
   const playSound = useCasebookSound(soundMode);
 
@@ -57,6 +59,8 @@ export const CasebookPage: React.FC = () => {
   React.useEffect(() => { localStorage.setItem('ayuuworks-casebook-sound', soundMode); }, [soundMode]);
   React.useEffect(() => { localStorage.setItem('ayuuworks-visual-trail', JSON.stringify(visualSaved)); }, [visualSaved]);
   const saveVisual = (item: InspirationItem) => { playSound('pin'); setVisualSaved((current) => current.includes(item.id) ? current : [...current, item.id]); };
+  const startProject = (payload: { businessType: string; businessName: string }) => { setProjectContext(payload); setExplorerOpen(false); setProjectBriefOpen(true); playSound('evidence'); };
+  const handoffProject = () => { localStorage.setItem('ayuuworks-project-handoff', JSON.stringify({ ...projectContext, savedClues: saved.length, visualReferences: visualSaved.length, timestamp: new Date().toISOString() })); window.location.href = '/#enquiry-experience'; };
   React.useEffect(() => { const open = () => setCaseboardOpen(true); window.addEventListener('open-caseboard', open); return () => window.removeEventListener('open-caseboard', open); }, []);
 
   return (
