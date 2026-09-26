@@ -3,6 +3,7 @@ import { ArrowUpRight, Bookmark, Camera, FileText, Play, Search, Sparkles, Check
 import { caseFiles, caseFilters } from '../casebook/data/cases';
 import { MediaEvidence } from '../casebook/components/MediaEvidence';
 import { MediaLightbox } from '../casebook/components/MediaLightbox';
+import { Caseboard, SavedClue } from '../casebook/components/Caseboard';
 
 const evidence = [
   { label: 'EVIDENCE', title: 'REAL CAMPAIGNS', text: 'Ads, launches aur brand moments jo actually duniya ne dekhe.', icon: Camera },
@@ -13,10 +14,14 @@ const evidence = [
 
 export const CasebookPage: React.FC = () => {
   const [filter, setFilter] = useState<(typeof caseFilters)[number]>('ALL');
-  const [saved, setSaved] = useState<string[]>([]);
+  const [saved, setSaved] = useState<SavedClue[]>(() => {
+    try { return JSON.parse(localStorage.getItem('ayuuworks-caseboard') || '[]'); } catch { return []; }
+  });
   const [activeMedia, setActiveMedia] = useState<import('../casebook/data/cases').CaseMedia | null>(null);
   const [activeCase, setActiveCase] = useState<(typeof caseFiles)[number] | null>(null);
   const [revealed, setRevealed] = useState<string[]>([]);
+  const [caseboardOpen, setCaseboardOpen] = useState(false);
+
 
   const visibleCases = useMemo(
     () => filter === 'ALL' ? caseFiles : caseFiles.filter((item) => item.type === filter),
@@ -25,9 +30,20 @@ export const CasebookPage: React.FC = () => {
 
   const reveal = (key: string) => setRevealed((current) => current.includes(key) ? current : [...current, key]);
 
-  const toggleSaved = (id: string) => {
-    setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  const saveDiscoveredClue = (caseItem: (typeof caseFiles)[number], clue: string, index: number) => {
+    const entry: SavedClue = { id: caseItem.id + '-discovered-' + index, caseId: caseItem.id, caseNumber: caseItem.number, caseTitle: caseItem.title, clue };
+    setSaved((current) => current.some((item) => item.id === entry.id) ? current : [...current, entry]);
   };
+
+  const toggleSaved = (id: string) => {
+    const item = caseFiles.find((entry) => entry.id === id);
+    if (!item) return;
+    const clue: SavedClue = { id: item.id + '-main-clue', caseId: item.id, caseNumber: item.number, caseTitle: item.title, clue: item.clue };
+    setSaved((current) => current.some((entry) => entry.id === clue.id) ? current.filter((entry) => entry.id !== clue.id) : [...current, clue]);
+  };
+
+  React.useEffect(() => { localStorage.setItem('ayuuworks-caseboard', JSON.stringify(saved)); }, [saved]);
+  React.useEffect(() => { const open = () => setCaseboardOpen(true); window.addEventListener('open-caseboard', open); return () => window.removeEventListener('open-caseboard', open); }, []);
 
   return (
     <main className="min-h-screen bg-[#F2EFE8] text-[#111111] pt-16">
@@ -107,7 +123,7 @@ export const CasebookPage: React.FC = () => {
 
         <div className="columns-1 gap-5 md:columns-2 xl:columns-3">
           {visibleCases.map((item, index) => {
-            const isSaved = saved.includes(item.id);
+            const isSaved = saved.some((entry) => entry.caseId === item.id);
             return (
               <article
                 key={item.id}
@@ -175,6 +191,9 @@ export const CasebookPage: React.FC = () => {
         </div>
       </section>
       {activeMedia && <MediaLightbox media={activeMedia} onClose={() => setActiveMedia(null)} />}
+      {caseboardOpen && <Caseboard clues={saved} onRemove={(id) => setSaved((current) => current.filter((item) => item.id !== id))} onClose={() => setCaseboardOpen(false)} />}
+      <button onClick={() => window.dispatchEvent(new Event("open-caseboard"))} className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 border border-[#111111]/20 bg-[#F2EFE8] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.16em] shadow-lg hover:border-[#B65B3C]"><Bookmark className="h-3.5 w-3.5" fill={saved.length ? "currentColor" : "none"} /> CASEBOARD {saved.length ? ` / ${saved.length}` : ""}</button>
+      {activeCase && (
       {activeCase && (
         <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#111111]/95 p-4 md:p-8" role="dialog" aria-modal="true">
           <div className="mx-auto max-w-6xl border border-[#F2EFE8]/15 bg-[#F2EFE8] text-[#111111]">
@@ -222,7 +241,7 @@ export const CasebookPage: React.FC = () => {
                             {open ? <Check className="h-4 w-4 text-[#B65B3C]" /> : <LockKeyhole className="h-4 w-4 opacity-50" />}
                             <span className="font-mono text-[9px] tracking-[0.16em]">CLUE / 0{i + 1}</span>
                           </div>
-                          {open ? <p className="mt-3 text-sm leading-6">{clue}</p> : <p className="mt-3 text-xs uppercase tracking-[0.12em] text-[#6b665d]">Click karke clue kholo</p>}
+                          {open ? <><p className="mt-3 text-sm leading-6">{clue}</p><span onClick={(event) => { event.stopPropagation(); saveDiscoveredClue(activeCase, clue, i); }} className="mt-4 inline-flex cursor-pointer items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#B65B3C]">SAVE THIS CLUE →</span></> : <p className="mt-3 text-xs uppercase tracking-[0.12em] text-[#6b665d]">Click karke clue kholo</p>}
                         </button>
                       );
                     })}
