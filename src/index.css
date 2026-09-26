@@ -32,11 +32,104 @@
   }
 }
 
-/* Editorial architectural grid lines */
+/* AAA Game Tactical HUD & Motion Graphics Styles */
 .bg-editorial-grid {
   background-image: linear-gradient(to right, rgba(215, 208, 197, 0.05) 1px, transparent 1px),
                     linear-gradient(to bottom, rgba(215, 208, 197, 0.05) 1px, transparent 1px);
-  background-size: 48px 48px;
+  background-size: 40px 40px;
+}
+
+/* Tactical HUD Corner Brackets */
+.hud-bracket {
+  position: relative;
+}
+.hud-bracket::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #B65B3C;
+  border-left: 2px solid #B65B3C;
+  pointer-events: none;
+  z-index: 10;
+}
+.hud-bracket::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-bottom: 2px solid #B65B3C;
+  border-right: 2px solid #B65B3C;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Tactical HUD Corner Brackets - Subtle Stone version */
+.hud-bracket-stone {
+  position: relative;
+}
+.hud-bracket-stone::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 6px;
+  height: 6px;
+  border-top: 1.5px solid rgba(215, 208, 197, 0.4);
+  border-left: 1.5px solid rgba(215, 208, 197, 0.4);
+  pointer-events: none;
+  z-index: 10;
+}
+.hud-bracket-stone::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 6px;
+  height: 6px;
+  border-bottom: 1.5px solid rgba(215, 208, 197, 0.4);
+  border-right: 1.5px solid rgba(215, 208, 197, 0.4);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Subtle CRT Scanlines for AAA Game Visual Feel */
+.scanlines-overlay {
+  background: linear-gradient(
+    rgba(17, 17, 17, 0) 50%,
+    rgba(0, 0, 0, 0.15) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
+/* Tactical Pulse Animation */
+@keyframes tactical-pulse {
+  0%, 100% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 2px rgba(182, 91, 60, 0.4));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(182, 91, 60, 0.8));
+  }
+}
+
+.animate-tactical-pulse {
+  animation: tactical-pulse 2.2s infinite ease-in-out;
+}
+
+/* Crosshair Reticle Cursor Marker */
+.reticle-dot {
+  width: 4px;
+  height: 4px;
+  background-color: #B65B3C;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #B65B3C;
 }
 
 /* Subtle architectural divider */

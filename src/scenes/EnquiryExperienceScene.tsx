@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAWE } from '../awe/context';
-import { Send, Check, ArrowRight, ArrowDown } from 'lucide-react';
+import { Send, Check, ArrowRight, ArrowDown, Terminal, Crosshair, Sparkles } from 'lucide-react';
+import { soundEngine } from '../services/soundEngine';
 
 export const EnquiryExperienceScene: React.FC = () => {
   const { session, trackEvent, isReducedMotion } = useAWE();
@@ -9,11 +10,11 @@ export const EnquiryExperienceScene: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     businessName: session.businessName || '',
-    businessType: session.industry || 'Physical / Local Business',
-    mainChallenge: session.primaryProblem || 'Look more premium',
+    businessType: session.industry || 'Physical / Luxury Destination',
+    mainChallenge: session.primaryProblem || 'Zyada luxury & premium lagna hai',
     helpNeeded: session.diagnosis?.relevant_services?.[0] || 'Brand Identity & Flagship Website',
     budgetRange: 'Rs 2.5L – Rs 5L',
-    timeline: 'Next 1–2 months',
+    timeline: 'Agley 1–2 mahine mein',
     contact: '',
     additionalContext: '',
   });
@@ -22,11 +23,13 @@ export const EnquiryExperienceScene: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    soundEngine.playTargetLock();
     trackEvent('cta_clicked', { target: 'submit_project_brief', ...formData });
     setSubmitted(true);
   };
 
   const scrollToExplorer = () => {
+    soundEngine.playClick();
     const el = document.getElementById('business-explorer');
     if (el) {
       el.scrollIntoView({ behavior: isReducedMotion ? 'auto' : 'smooth' });
@@ -40,55 +43,61 @@ export const EnquiryExperienceScene: React.FC = () => {
     >
       <div id="enquiry-section" className="hidden" />
 
-      {/* Section 28: Final CTA */}
+      {/* Final Call to Action in Hinglish */}
       <div className="text-center max-w-3xl mx-auto space-y-6">
-        <div className="text-[11px] font-mono tracking-widest text-[#B65B3C] uppercase">
-          INITIATE · 09
+        <div className="flex items-center justify-center gap-2 text-[11px] font-mono tracking-widest text-[#B65B3C] uppercase">
+          <Terminal className="w-3.5 h-3.5 text-[#B65B3C]" />
+          <span>INITIATE · 11 // TACTICAL COMMISSION</span>
         </div>
 
         <h2 className="text-4xl sm:text-6xl md:text-7xl font-black font-display text-[#F2EFE8] tracking-tight leading-[0.98]">
-          WHAT SHOULD YOUR BUSINESS<br />
-          <span className="text-[#D7D0C5]">BECOME NEXT?</span>
+          AB AAPKE BUSINESS KO<br />
+          <span className="text-[#D7D0C5]">KYA BANNA CHAHIYE?</span>
         </h2>
 
         <p className="text-base sm:text-lg text-[#9B978F] max-w-xl mx-auto leading-relaxed pt-2">
-          We take on a limited number of commissions each quarter to ensure uncompromised strategic focus, custom design, and engineering depth.
+          Hum har quarter bohot limited high-ticket projects lete hain taaki har brand ko uncompromised strategic focus, custom design aur deep engineering mil sake.
         </p>
 
         {/* Primary and Secondary CTA Buttons */}
         {!formOpen && !submitted && (
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
-              onClick={() => setFormOpen(true)}
-              className="w-full sm:w-auto px-8 py-4 rounded bg-[#F2EFE8] hover:bg-[#B65B3C] text-[#111111] hover:text-[#F2EFE8] font-display font-bold text-xs uppercase tracking-widest transition-all cursor-pointer shadow-sm"
+              onClick={() => {
+                soundEngine.playTargetLock();
+                setFormOpen(true);
+              }}
+              onMouseEnter={() => soundEngine.playHover()}
+              className="w-full sm:w-auto px-8 py-4 rounded-sm bg-[#F2EFE8] hover:bg-[#B65B3C] text-[#111111] hover:text-[#F2EFE8] font-mono font-bold text-xs uppercase tracking-widest transition-all cursor-pointer shadow-lg shadow-[#B65B3C]/10"
             >
-              START A PROJECT
+              COMMISSION INITIATE KARO →
             </button>
 
             <button
               onClick={scrollToExplorer}
-              className="w-full sm:w-auto px-6 py-4 rounded bg-[#161616] hover:bg-[#202020] text-[#D7D0C5] hover:text-[#F2EFE8] border border-[#242424] text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer"
+              onMouseEnter={() => soundEngine.playHover()}
+              className="w-full sm:w-auto px-6 py-4 rounded-sm bg-[#161616] hover:bg-[#202020] text-[#D7D0C5] hover:text-[#F2EFE8] border border-[#242424] text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer"
             >
-              EXPLORE MY BUSINESS
+              BUSINESS EXPLORE KARO
             </button>
           </div>
         )}
       </div>
 
-      {/* Section 29: Business Brief Form */}
+      {/* Business Brief Form in Hinglish with AAA Game HUD Bracket */}
       {formOpen && !submitted && (
-        <div className="mt-14 p-8 sm:p-10 rounded border border-[#242424] bg-[#141414] max-w-3xl mx-auto space-y-8 animate-fadeIn">
-          <div className="border-b border-[#242424] pb-4 flex items-center justify-between">
+        <div className="hud-bracket mt-14 p-8 sm:p-10 rounded-sm border border-[#242424] bg-[#141414] max-w-3xl mx-auto space-y-8 animate-fadeIn shadow-2xl">
+          <div className="border-b border-[#242424] pb-4 flex items-center justify-between flex-wrap gap-2">
             <div>
               <span className="text-xs font-mono uppercase text-[#B65B3C] font-bold">
-                COMMISSION BRIEF
+                COMMISSION BRIEF ARCHITECTURE
               </span>
-              <h3 className="text-xl font-bold font-display text-[#F2EFE8] mt-1">
-                TELL US ABOUT THE OPPORTUNITY.
+              <h3 className="text-xl sm:text-2xl font-bold font-display text-[#F2EFE8] mt-1">
+                APNE VISION & OPPORTUNITY KE BAARE MEIN BATAO.
               </h3>
             </div>
-            <span className="text-xs font-mono text-[#9B978F]">
-              INPUTS PRE-FILLED FROM SESSION
+            <span className="text-[10px] font-mono text-[#9B978F] bg-[#111111] px-2 py-1 border border-[#242424] rounded-sm">
+              PRE-FILLED VIA SESSION
             </span>
           </div>
 
@@ -96,28 +105,29 @@ export const EnquiryExperienceScene: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-mono text-[#9B978F] block mb-1">
-                  YOUR NAME *
+                  AAPKA NAAM *
                 </label>
                 <input
-                  type="text"
                   required
+                  type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Vikramaditya Singh"
-                  className="w-full p-3 rounded bg-[#111111] border border-[#242424] text-xs text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
+                  placeholder="Jaise: Ayush Mishra"
+                  className="w-full p-3 rounded-sm bg-[#0d0d0d] border border-[#242424] text-sm text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
                 />
               </div>
 
               <div>
                 <label className="text-xs font-mono text-[#9B978F] block mb-1">
-                  BUSINESS NAME
+                  BRAND / COMPANY KA NAAM *
                 </label>
                 <input
+                  required
                   type="text"
                   value={formData.businessName}
                   onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                  placeholder="e.g. The Heritage Haveli"
-                  className="w-full p-3 rounded bg-[#111111] border border-[#242424] text-xs text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
+                  placeholder="Jaise: The Grand Haveli"
+                  className="w-full p-3 rounded-sm bg-[#0d0d0d] border border-[#242424] text-sm text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
                 />
               </div>
             </div>
@@ -125,25 +135,25 @@ export const EnquiryExperienceScene: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-mono text-[#9B978F] block mb-1">
-                  BUSINESS TYPE
+                  BUSINESS CATEGORY
                 </label>
                 <input
                   type="text"
                   value={formData.businessType}
                   onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
-                  className="w-full p-3 rounded bg-[#111111] border border-[#242424] text-xs text-[#D7D0C5] focus:border-[#B65B3C] outline-none"
+                  className="w-full p-3 rounded-sm bg-[#0d0d0d] border border-[#242424] text-sm text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
                 />
               </div>
 
               <div>
                 <label className="text-xs font-mono text-[#9B978F] block mb-1">
-                  MAIN CHALLENGE
+                  KAHAN SABSE BADI PROBLEM HAI?
                 </label>
                 <input
                   type="text"
                   value={formData.mainChallenge}
                   onChange={(e) => setFormData({ ...formData, mainChallenge: e.target.value })}
-                  className="w-full p-3 rounded bg-[#111111] border border-[#242424] text-xs text-[#D7D0C5] focus:border-[#B65B3C] outline-none"
+                  className="w-full p-3 rounded-sm bg-[#0d0d0d] border border-[#242424] text-sm text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
                 />
               </div>
             </div>
@@ -151,92 +161,73 @@ export const EnquiryExperienceScene: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-mono text-[#9B978F] block mb-1">
-                  WHAT DO YOU NEED HELP WITH?
-                </label>
-                <select
-                  value={formData.helpNeeded}
-                  onChange={(e) => setFormData({ ...formData, helpNeeded: e.target.value })}
-                  className="w-full p-3 rounded bg-[#111111] border border-[#242424] text-xs text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
-                >
-                  <option>Brand Identity & Flagship Website</option>
-                  <option>High-Performance Web Experience & Development</option>
-                  <option>Atmospheric Content & Cinematic Video</option>
-                  <option>Comprehensive Business Engine (Full-Stack)</option>
-                  <option>Strategic Brand Repositioning</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-xs font-mono text-[#9B978F] block mb-1">
-                  EXPECTED BUDGET RANGE
+                  BUDGET BRACKET
                 </label>
                 <select
                   value={formData.budgetRange}
                   onChange={(e) => setFormData({ ...formData, budgetRange: e.target.value })}
-                  className="w-full p-3 rounded bg-[#111111] border border-[#242424] text-xs text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
+                  className="w-full p-3 rounded-sm bg-[#0d0d0d] border border-[#242424] text-xs font-mono text-[#F2EFE8] focus:border-[#B65B3C] outline-none cursor-pointer"
                 >
-                  <option>Rs 1.5L – Rs 3L (Foundation)</option>
-                  <option>Rs 3L – Rs 7L (Flagship Experience)</option>
-                  <option>Rs 7L – Rs 15L+ (Enterprise / Comprehensive)</option>
-                  <option>To be determined following diagnosis</option>
+                  <option>Rs 1.5L – Rs 2.5L (Starter Elevation)</option>
+                  <option>Rs 2.5L – Rs 5L (Flagship System)</option>
+                  <option>Rs 5L – Rs 10L+ (Full Multi-discipline)</option>
                 </select>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-mono text-[#9B978F] block mb-1">
-                  DESIRED TIMELINE
+                  EXPECTED LAUNCH TIMELINE
                 </label>
                 <select
                   value={formData.timeline}
                   onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
-                  className="w-full p-3 rounded bg-[#111111] border border-[#242424] text-xs text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
+                  className="w-full p-3 rounded-sm bg-[#0d0d0d] border border-[#242424] text-xs font-mono text-[#F2EFE8] focus:border-[#B65B3C] outline-none cursor-pointer"
                 >
-                  <option>Immediate (Next 1–2 months)</option>
-                  <option>Next Quarter (2–4 months)</option>
-                  <option>Planning phase (4+ months)</option>
+                  <option>Agley 3–4 hafton mein (Urgent)</option>
+                  <option>Agley 1–2 mahine mein (Standard)</option>
+                  <option>Q4 / Next Quarter ke liye planning</option>
                 </select>
-              </div>
-
-              <div>
-                <label className="text-xs font-mono text-[#9B978F] block mb-1">
-                  CONTACT (EMAIL OR WHATSAPP) *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.contact}
-                  onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                  placeholder="e.g. name@domain.com or +91 98765 43210"
-                  className="w-full p-3 rounded bg-[#111111] border border-[#242424] text-xs text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
-                />
               </div>
             </div>
 
             <div>
               <label className="text-xs font-mono text-[#9B978F] block mb-1">
-                ADDITIONAL CONTEXT
+                WHATSAPP / PHONE YA EMAIL *
+              </label>
+              <input
+                required
+                type="text"
+                value={formData.contact}
+                onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+                placeholder="+91 98765 43210 ya founder@domain.com"
+                className="w-full p-3 rounded-sm bg-[#0d0d0d] border border-[#242424] text-sm text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-mono text-[#9B978F] block mb-1">
+                KOI AUR ZAROORI BAAT JO HUMEIN PEHLE SE JAANNI CHAHIYE?
               </label>
               <textarea
                 rows={3}
                 value={formData.additionalContext}
                 onChange={(e) => setFormData({ ...formData, additionalContext: e.target.value })}
-                placeholder="What are you trying to change? What would success look like for your business?"
-                className="w-full p-3 rounded bg-[#111111] border border-[#242424] text-xs text-[#F2EFE8] focus:border-[#B65B3C] outline-none"
+                placeholder="Current website URL, offline reach, target customer profile, ya jo bhi dimaag mein chal raha ho..."
+                className="w-full p-3 rounded-sm bg-[#0d0d0d] border border-[#242424] text-xs text-[#F2EFE8] focus:border-[#B65B3C] outline-none resize-none"
               />
             </div>
 
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#242424]">
-              <span className="text-xs text-[#9B978F]">
-                Direct response within 24 hours from studio leadership.
+            <div className="pt-4 border-t border-[#242424] flex flex-col sm:flex-row items-center justify-between gap-4">
+              <span className="text-[11px] font-mono text-[#9B978F]">
+                CONFIDENTIAL & DIRECTLY REVIEWED BY AYUSH MISHRA
               </span>
 
               <button
                 type="submit"
-                className="w-full sm:w-auto px-8 py-3.5 rounded bg-[#F2EFE8] hover:bg-[#B65B3C] text-[#111111] hover:text-[#F2EFE8] text-xs font-bold font-display uppercase tracking-widest transition-all flex items-center justify-center gap-2 cursor-pointer"
+                onMouseEnter={() => soundEngine.playHover()}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-sm bg-[#B65B3C] hover:bg-[#c96948] text-[#F2EFE8] text-xs font-mono font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#B65B3C]/20"
               >
-                <span>SUBMIT COMMISSION BRIEF</span>
+                <span>BRIEF TRANSMIT KARO</span>
                 <Send className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -244,28 +235,22 @@ export const EnquiryExperienceScene: React.FC = () => {
         </div>
       )}
 
-      {/* Confirmation State */}
+      {/* Confirmation State in Hinglish */}
       {submitted && (
-        <div className="mt-14 p-10 rounded border border-[#B65B3C] bg-[#161413] max-w-2xl mx-auto text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-[#B65B3C] text-[#F2EFE8] flex items-center justify-center mx-auto">
+        <div className="hud-bracket mt-14 p-10 rounded-sm border border-[#B65B3C] bg-[#161413] max-w-xl mx-auto text-center space-y-4 shadow-2xl">
+          <div className="w-12 h-12 rounded-full bg-[#B65B3C]/20 border border-[#B65B3C] flex items-center justify-center mx-auto text-[#B65B3C]">
             <Check className="w-6 h-6" />
           </div>
           <h3 className="text-2xl font-bold font-display text-[#F2EFE8]">
-            COMMISSION BRIEF RECEIVED.
+            COMMISSION BRIEF TRANSMITTED.
           </h3>
-          <p className="text-sm text-[#D7D0C5] max-w-md mx-auto leading-relaxed">
-            Thank you, {formData.name || 'there'}. We have received your brief and diagnostic profile. Ayush Mishra will review your context and reach out directly via {formData.contact || 'your contact'}.
+          <p className="text-sm text-[#D7D0C5] leading-relaxed">
+            Shukriya {formData.name || 'Founder'}. Aapka brief Ayush Mishra ke direct desk tak pahunch chuka hai. Hum agle 24 ghante ke andar aapse connect karenge.
           </p>
           <div className="pt-2">
-            <button
-              onClick={() => {
-                setSubmitted(false);
-                setFormOpen(false);
-              }}
-              className="text-xs font-mono text-[#9B978F] hover:text-[#F2EFE8] underline"
-            >
-              ← Back to Studio Experience
-            </button>
+            <span className="inline-block px-3 py-1 bg-[#111111] border border-[#242424] text-[10px] font-mono text-[#9B978F]">
+              PRIORITY QUEUE ID // AYU-{Math.floor(1000 + Math.random() * 9000)}
+            </span>
           </div>
         </div>
       )}

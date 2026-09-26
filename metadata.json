@@ -2,6 +2,7 @@
   "name": "AyuuWorks — The Business Engine",
   "description": "Luxury creative and digital agency experience powered by AWE (AyuuWorks Experience Engine) with real-time business diagnosis and cinematic strategy.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
-

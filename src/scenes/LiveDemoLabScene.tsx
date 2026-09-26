@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAWE } from '../awe/context';
-import { Smartphone, Monitor, Check, Shield, ZoomIn, ArrowRight } from 'lucide-react';
+import { Smartphone, Monitor, Check, Shield, ZoomIn, ArrowRight, Terminal, Crosshair, Play } from 'lucide-react';
+import { soundEngine } from '../services/soundEngine';
 
 export const LiveDemoLabScene: React.FC = () => {
   const { session, interactDemo } = useAWE();
@@ -8,7 +9,6 @@ export const LiveDemoLabScene: React.FC = () => {
 
   // Website Demo States
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
-  const [densityMode, setDensityMode] = useState<'editorial' | 'compact'>('editorial');
 
   // Brand Transformation States
   const [brandStyle, setBrandStyle] = useState<'ayuuworks' | 'traditional'>('ayuuworks');
@@ -18,45 +18,46 @@ export const LiveDemoLabScene: React.FC = () => {
 
   // Concierge Funnel States
   const [conciergeStep, setConciergeStep] = useState<1 | 2 | 3>(1);
-  const [conciergeData, setConciergeData] = useState({ date: 'November 2026', occasion: 'Bridal Celebration' });
+  const [conciergeData, setConciergeData] = useState({ date: 'November 2026', occasion: 'Royal Destination Wedding' });
 
   const handleSelectDemo = (demo: any) => {
+    soundEngine.playTargetLock();
     setActiveDemo(demo);
     interactDemo(demo);
   };
 
   return (
     <section id="live-lab" className="relative py-24 px-6 max-w-7xl mx-auto border-t border-[#242424] bg-[#111111]">
-      {/* Header */}
+      {/* Header in Hinglish with AAA Game HUD label */}
       <div className="max-w-3xl mb-12">
         <div className="flex items-center gap-2 text-xs font-mono tracking-widest text-[#B65B3C] uppercase mb-3">
-          <span>LABORATORY · 07</span>
-          <span>·</span>
-          <span>FUNCTIONAL PROTOTYPES</span>
+          <Terminal className="w-3.5 h-3.5 text-[#B65B3C]" />
+          <span>LABORATORY · 07 // LIVE PLAYABLE PROTOTYPES</span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-black font-display text-[#F2EFE8] tracking-tight leading-tight">
-          DON'T JUST LOOK.<br />TRY IT.
+          DEKH KE NAHI.<br />CHALA KE DEKHO.
         </h2>
         <p className="text-base text-[#9B978F] mt-3 leading-relaxed">
-          Test real interface systems, typography scaling, macro craft loupes and conversion funnels. Every control operates live.
+          Yahan koi static image ya fake video mockup nahi hai. Har control live operates karta hai: Viewport scale, brand transformation, macro lens aur VIP conversion funnel.
         </p>
       </div>
 
-      {/* Demo Selector Tabs */}
-      <div className="flex flex-wrap gap-2 p-1.5 bg-[#141414] border border-[#242424] rounded max-w-4xl mb-8">
+      {/* Demo Selector Tabs (AAA Game HUD selector) */}
+      <div className="flex flex-wrap gap-2 p-1.5 bg-[#141414] border border-[#242424] rounded-sm max-w-4xl mb-8">
         {[
-          { id: 'website', label: '01 / INTERACTIVE WEBSITE' },
+          { id: 'website', label: '01 / INTERACTIVE FLAGSHIP' },
           { id: 'brand', label: '02 / BRAND TRANSFORMATION' },
           { id: 'showroom', label: '03 / DIGITAL SHOWROOM' },
           { id: 'social', label: '04 / 9-GRID SOCIAL SYSTEM' },
-          { id: 'concierge', label: '05 / CONCIERGE FUNNEL' },
+          { id: 'concierge', label: '05 / VIP CONCIERGE FUNNEL' },
         ].map((d) => (
           <button
             key={d.id}
             onClick={() => handleSelectDemo(d.id as any)}
-            className={`px-4 py-2 rounded text-xs font-mono tracking-wider transition-all cursor-pointer ${
+            onMouseEnter={() => soundEngine.playHover()}
+            className={`px-4 py-2 rounded-sm text-xs font-mono tracking-wider transition-all cursor-pointer ${
               activeDemo === d.id
-                ? 'bg-[#F2EFE8] text-[#111111] font-bold shadow-sm'
+                ? 'bg-[#F2EFE8] text-[#111111] font-bold shadow-md shadow-[#B65B3C]/10'
                 : 'text-[#9B978F] hover:text-[#F2EFE8] hover:bg-[#1c1c1c]'
             }`}
           >
@@ -67,19 +68,22 @@ export const LiveDemoLabScene: React.FC = () => {
 
       {/* DEMO 01: Interactive Website System */}
       {activeDemo === 'website' && (
-        <div className="p-6 md:p-8 bg-[#141414] border border-[#242424] rounded space-y-6">
+        <div className="hud-bracket p-6 md:p-8 bg-[#141414] border border-[#242424] rounded-sm space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#242424] pb-4">
             <div>
-              <span className="text-xs font-mono text-[#B65B3C] uppercase">LAYOUT ARCHITECTURE</span>
+              <span className="text-xs font-mono text-[#B65B3C] uppercase font-bold">VIEWPORT ENGINE // REAL-TIME RESPONSIVENESS</span>
               <p className="text-sm font-bold text-[#F2EFE8] mt-0.5">
-                Toggle viewport framing and layout density in real time.
+                Toggle framing aur layout density real time mein test karo.
               </p>
             </div>
 
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setDeviceMode('desktop')}
-                className={`px-3 py-1.5 text-xs rounded border flex items-center gap-1.5 cursor-pointer ${
+                onClick={() => {
+                  soundEngine.playClick();
+                  setDeviceMode('desktop');
+                }}
+                className={`px-3 py-1.5 text-xs font-mono rounded-sm border flex items-center gap-1.5 cursor-pointer ${
                   deviceMode === 'desktop' ? 'border-[#B65B3C] text-[#F2EFE8] bg-[#1a1816]' : 'border-[#242424] text-[#9B978F]'
                 }`}
               >
@@ -87,8 +91,11 @@ export const LiveDemoLabScene: React.FC = () => {
                 <span>Desktop (16:9)</span>
               </button>
               <button
-                onClick={() => setDeviceMode('mobile')}
-                className={`px-3 py-1.5 text-xs rounded border flex items-center gap-1.5 cursor-pointer ${
+                onClick={() => {
+                  soundEngine.playClick();
+                  setDeviceMode('mobile');
+                }}
+                className={`px-3 py-1.5 text-xs font-mono rounded-sm border flex items-center gap-1.5 cursor-pointer ${
                   deviceMode === 'mobile' ? 'border-[#B65B3C] text-[#F2EFE8] bg-[#1a1816]' : 'border-[#242424] text-[#9B978F]'
                 }`}
               >
@@ -99,16 +106,16 @@ export const LiveDemoLabScene: React.FC = () => {
           </div>
 
           {/* Interactive Frame Simulator */}
-          <div className="flex justify-center bg-[#0d0d0d] p-6 rounded border border-[#242424] overflow-hidden">
+          <div className="flex justify-center bg-[#0d0d0d] p-6 rounded-sm border border-[#242424] overflow-hidden">
             <div
-              className={`transition-all duration-500 rounded border border-[#242424] bg-[#111111] overflow-hidden ${
+              className={`transition-all duration-500 rounded-sm border border-[#242424] bg-[#111111] overflow-hidden ${
                 deviceMode === 'mobile' ? 'w-72 h-96' : 'w-full max-w-2xl h-80'
               }`}
             >
               {/* Simulated Browser Bar */}
               <div className="px-3 py-1.5 bg-[#181818] border-b border-[#242424] flex items-center justify-between text-[10px] font-mono text-[#9B978F]">
                 <div className="flex gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#242424]"></span>
+                  <span className="w-2 h-2 rounded-full bg-[#B65B3C]"></span>
                   <span className="w-2 h-2 rounded-full bg-[#242424]"></span>
                   <span className="w-2 h-2 rounded-full bg-[#242424]"></span>
                 </div>
@@ -117,18 +124,18 @@ export const LiveDemoLabScene: React.FC = () => {
 
               {/* Simulated Content */}
               <div className="p-6 space-y-4">
-                <span className="text-[10px] font-mono text-[#B65B3C] uppercase tracking-widest">
-                  AYUUWORKS PROTOTYPE
+                <span className="text-[10px] font-mono text-[#B65B3C] uppercase tracking-widest font-bold">
+                  AYUUWORKS PROTOTYPE ENGINE
                 </span>
                 <h4 className="text-xl sm:text-2xl font-bold font-display text-[#F2EFE8] leading-tight">
-                  UNCOMPROMISING PRECISION IN EVERY PIXEL.
+                  HAR EK PIXEL MEIN UNCOMPROMISING PRECISION.
                 </h4>
                 <p className="text-xs text-[#9B978F] leading-relaxed line-clamp-3">
-                  A bespoke digital flagship balances generous whitespace, razor-sharp typography hierarchy, and sub-100ms response times.
+                  Bespoke digital flagships generous whitespace, razor-sharp typography hierarchy aur sub-100ms response time ke saath deliver kiye jaate hain.
                 </p>
                 <div className="pt-2 flex gap-3">
-                  <span className="px-3 py-1.5 text-[10px] font-mono uppercase bg-[#F2EFE8] text-[#111111] font-bold rounded">
-                    EXPLORE COLLECTION
+                  <span className="px-3 py-1.5 text-[10px] font-mono uppercase bg-[#F2EFE8] text-[#111111] font-bold rounded-sm">
+                    EXPLORE WORLD →
                   </span>
                 </div>
               </div>
@@ -139,75 +146,87 @@ export const LiveDemoLabScene: React.FC = () => {
 
       {/* DEMO 02: Brand Transformation */}
       {activeDemo === 'brand' && (
-        <div className="p-6 md:p-8 bg-[#141414] border border-[#242424] rounded space-y-6">
+        <div className="hud-bracket p-6 md:p-8 bg-[#141414] border border-[#242424] rounded-sm space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#242424] pb-4">
             <div>
-              <span className="text-xs font-mono text-[#B65B3C] uppercase">PERCEPTION ENGINE</span>
+              <span className="text-xs font-mono text-[#B65B3C] uppercase font-bold">IDENTITY ARCHITECTURE // BEFORE VS AFTER</span>
               <p className="text-sm font-bold text-[#F2EFE8] mt-0.5">
-                Toggle between commodity marketing and AyuuWorks editorial direction.
+                Dekho kaise positioning ek ordinary brand ko category landmark bana deti hai.
               </p>
             </div>
 
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setBrandStyle('traditional')}
-                className={`px-3 py-1.5 text-xs rounded border cursor-pointer ${
-                  brandStyle === 'traditional' ? 'border-[#B65B3C] bg-[#1a1816] text-[#F2EFE8]' : 'border-[#242424] text-[#9B978F]'
+                onClick={() => {
+                  soundEngine.playClick();
+                  setBrandStyle('traditional');
+                }}
+                className={`px-3 py-1.5 text-xs font-mono rounded-sm border cursor-pointer ${
+                  brandStyle === 'traditional' ? 'border-[#B65B3C] text-[#F2EFE8] bg-[#1a1816]' : 'border-[#242424] text-[#9B978F]'
                 }`}
               >
-                Commodity Template
+                AAM AGENCY TEMPLATE
               </button>
               <button
-                onClick={() => setBrandStyle('ayuuworks')}
-                className={`px-3 py-1.5 text-xs rounded border cursor-pointer ${
-                  brandStyle === 'ayuuworks' ? 'border-[#B65B3C] bg-[#1a1816] text-[#F2EFE8]' : 'border-[#242424] text-[#9B978F]'
+                onClick={() => {
+                  soundEngine.playTargetLock();
+                  setBrandStyle('ayuuworks');
+                }}
+                className={`px-3 py-1.5 text-xs font-mono rounded-sm border cursor-pointer ${
+                  brandStyle === 'ayuuworks' ? 'border-[#B65B3C] text-[#F2EFE8] bg-[#1a1816]' : 'border-[#242424] text-[#9B978F]'
                 }`}
               >
-                AyuuWorks Editorial
+                AYUUWORKS EDITORIAL
               </button>
             </div>
           </div>
 
-          <div
-            className={`p-8 rounded border transition-all duration-500 ${
-              brandStyle === 'ayuuworks'
-                ? 'bg-[#111111] border-[#B65B3C] text-[#F2EFE8]'
-                : 'bg-[#1e1b18] border-[#383838] text-yellow-100'
-            }`}
-          >
-            <div className="max-w-xl mx-auto space-y-4 text-center">
-              <span className="text-[10px] font-mono tracking-widest uppercase text-[#B65B3C]">
-                {brandStyle === 'ayuuworks' ? 'EST. 1892 · ROYAL PALACE RETREAT' : 'SPECIAL DISCOUNT SALE TODAY!!'}
-              </span>
-
-              <h3 className="text-2xl sm:text-3xl font-bold font-display text-[#F2EFE8]">
-                {session.businessName || 'THE GRAND HAVELI ESTATE'}
-              </h3>
-
-              <p className="text-xs sm:text-sm text-[#9B978F] leading-relaxed max-w-md mx-auto">
-                {brandStyle === 'ayuuworks'
-                  ? 'A private royal heritage destination dedicated to bespoke hospitality, experiential dining, and architectural serenity.'
-                  : 'Call us now for 20% off on all weekend bookings! Hurry up, limited rooms left near highway.'}
-              </p>
-
-              <div className="pt-2">
-                <span className="inline-block px-5 py-2 text-xs font-mono uppercase rounded bg-[#F2EFE8] text-[#111111] font-bold">
-                  {brandStyle === 'ayuuworks' ? 'EXPLORE ARCHIVE' : 'CALL NOW: 9876543210'}
+          <div className="p-8 rounded-sm border border-[#242424] flex items-center justify-center min-h-[240px] bg-[#0d0d0d]">
+            {brandStyle === 'traditional' ? (
+              <div className="text-center space-y-3 max-w-md">
+                <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                  GENERIC TEMPLATE STYLE
                 </span>
+                <h4 className="text-2xl font-bold text-slate-200">
+                  Best Luxury Services & 100% Guaranteed Satisfaction!
+                </h4>
+                <p className="text-xs text-slate-400">
+                  Call today for free consultation and discount coupons.
+                </p>
+                <button className="px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-xs rounded-full">
+                  Click Here Now!
+                </button>
               </div>
-            </div>
+            ) : (
+              <div className="text-center space-y-4 max-w-md">
+                <span className="text-[10px] font-mono tracking-widest uppercase text-[#B65B3C] font-bold">
+                  AYUUWORKS EDITORIAL ARCHITECTURE
+                </span>
+                <h4 className="text-3xl font-black font-display text-[#F2EFE8] tracking-tight">
+                  BUILT FOR MEMORY.
+                </h4>
+                <p className="text-xs text-[#D7D0C5] leading-relaxed">
+                  Jab quality mein dum hota hai, toh shor machane ki zaroorat nahi padti. Silent authority earns high-ticket conviction.
+                </p>
+                <div className="pt-2">
+                  <span className="px-5 py-2 border border-[#B65B3C] text-[#F2EFE8] font-mono text-xs uppercase font-bold tracking-wider rounded-sm">
+                    ENTER THE ARCHIVE →
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* DEMO 03: Digital Showroom Loupe */}
+      {/* DEMO 03: Digital Showroom */}
       {activeDemo === 'showroom' && (
-        <div className="p-6 md:p-8 bg-[#141414] border border-[#242424] rounded space-y-6">
+        <div className="hud-bracket p-6 md:p-8 bg-[#141414] border border-[#242424] rounded-sm space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#242424] pb-4">
             <div>
-              <span className="text-xs font-mono text-[#B65B3C] uppercase">TACTILE CRAFT INSPECTOR</span>
+              <span className="text-xs font-mono text-[#B65B3C] uppercase font-bold">MACRO CRAFT LOUPE // PHYSICAL PROVENANCE</span>
               <p className="text-sm font-bold text-[#F2EFE8] mt-0.5">
-                Simulate high-resolution hallmark verification and macro filigree zoom.
+                Physical details ko digital screen par zoom in karke test karo.
               </p>
             </div>
 
@@ -215,119 +234,140 @@ export const LiveDemoLabScene: React.FC = () => {
               {[1, 2, 4].map((z) => (
                 <button
                   key={z}
-                  onClick={() => setZoomLevel(z)}
-                  className={`px-3 py-1 text-xs rounded border cursor-pointer ${
-                    zoomLevel === z ? 'border-[#B65B3C] text-[#B65B3C] bg-[#1a1816]' : 'border-[#242424] text-[#9B978F]'
+                  onClick={() => {
+                    soundEngine.playClick();
+                    setZoomLevel(z);
+                  }}
+                  className={`px-3 py-1.5 text-xs font-mono rounded-sm border cursor-pointer ${
+                    zoomLevel === z ? 'border-[#B65B3C] text-[#F2EFE8] bg-[#1a1816]' : 'border-[#242424] text-[#9B978F]'
                   }`}
                 >
-                  {z}x Loupe
+                  {z}x Zoom
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="relative h-64 md:h-72 bg-[#0c0c0c] border border-[#242424] rounded flex items-center justify-center overflow-hidden">
+          <div className="h-64 rounded-sm border border-[#242424] bg-[#0d0d0d] flex items-center justify-center overflow-hidden relative">
             <div
               className="transition-transform duration-500 ease-out text-center p-6"
               style={{ transform: `scale(${zoomLevel})` }}
             >
-              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-[#242424] via-[#333333] to-[#B65B3C] shadow-lg flex items-center justify-center border-2 border-[#111111]">
-                <Shield className="w-8 h-8 text-[#F2EFE8]" />
+              <div className="w-16 h-16 mx-auto mb-2 rounded-full border-2 border-[#B65B3C] flex items-center justify-center">
+                <span className="text-xs font-mono font-bold text-[#F2EFE8]">1892</span>
               </div>
-              <p className="text-xs font-mono font-bold text-[#B65B3C] mt-3">
-                BIS 916 HALLMARK · CERTIFIED 22KT
-              </p>
-              <p className="text-[10px] font-mono text-[#9B978F]">ARCHIVE REF: AYU-GH-892</p>
+              <h5 className="text-sm font-bold font-display text-[#F2EFE8]">HAND-CARVED PALACE MASONRY</h5>
+              <p className="text-[10px] text-[#9B978F] font-mono mt-1">24k Gold leaf detailing & tactile sandstone</p>
             </div>
 
-            <div className="absolute bottom-3 left-3 bg-[#111111]/90 px-3 py-1 rounded border border-[#242424] text-[11px] font-mono text-[#9B978F]">
-              ZOOM: {zoomLevel}x · TACTILE RESOLUTION 4K
+            <div className="absolute bottom-3 right-3 text-[10px] font-mono text-[#9B978F] bg-[#141414]/90 px-2 py-1 border border-[#242424] rounded-sm">
+              OPTICAL LOUPE: {zoomLevel}X ACTIVE
             </div>
           </div>
         </div>
       )}
 
-      {/* DEMO 04: Social Creative 9-Grid */}
+      {/* DEMO 04: 9-Grid Social System */}
       {activeDemo === 'social' && (
-        <div className="p-6 md:p-8 bg-[#141414] border border-[#242424] rounded space-y-6">
+        <div className="hud-bracket p-6 md:p-8 bg-[#141414] border border-[#242424] rounded-sm space-y-6">
           <div className="border-b border-[#242424] pb-4">
-            <span className="text-xs font-mono text-[#B65B3C] uppercase">THE 9-GRID EDITORIAL FORMULA</span>
+            <span className="text-xs font-mono text-[#B65B3C] uppercase font-bold">EDITORIAL GRID ARCHITECTURE // SOCIAL AUTHORITY</span>
             <p className="text-sm font-bold text-[#F2EFE8] mt-0.5">
-              Arranging social touchpoints as an editorial lookbook instead of random sales flyers.
+              Random daily posting band karo. Ek deliberate 9-grid signature aesthetic build karo.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 max-w-sm mx-auto">
+          <div className="grid grid-cols-3 gap-2 max-w-sm mx-auto p-4 bg-[#0d0d0d] rounded-sm border border-[#242424]">
             {[
-              { type: 'ARCHIVE', label: 'Raw Gold Pouring Video' },
-              { type: 'PORTRAIT', label: 'Bridal Polki Editorial' },
-              { type: 'QUOTE', label: '"Trust is not Discounted"' },
-              { type: 'HERITAGE', label: 'Third-Gen Karigar Portrait' },
-              { type: 'FLAGSHIP', label: 'Showroom Chandelier Walk' },
-              { type: 'DETAILS', label: 'Emerald Setting Macro' },
-              { type: 'CONCIERGE', label: 'Private Viewing Slots Open' },
-              { type: 'TROUSSEAU', label: 'Matching Choker & Nath' },
-              { type: 'LEGACY', label: '45-Year Hallmark Promise' },
-            ].map((cell, idx) => (
+              'THE MANIFESTO', 'ARCHITECTURAL DEPTH', 'THE FOUNDER',
+              'CRAFT ARCHIVE', 'STATEMENT EDITORIAL', 'MATERIAL DETAIL',
+              'CLIENT TRANSFORMATION', 'THE BLUEPRINT', 'START THE CHAPTER'
+            ].map((title, i) => (
               <div
-                key={idx}
-                className="aspect-square bg-[#111111] border border-[#242424] rounded p-2 flex flex-col justify-between hover:border-[#B65B3C] transition-colors"
+                key={i}
+                className="aspect-square bg-[#161616] border border-[#242424] p-2 flex flex-col justify-between text-left hover:border-[#B65B3C] transition-colors cursor-pointer group"
               >
-                <span className="text-[8px] font-mono text-[#B65B3C]">{cell.type}</span>
-                <p className="text-[9px] font-bold text-[#D7D0C5] leading-tight">{cell.label}</p>
+                <span className="text-[8px] font-mono text-[#9B978F] group-hover:text-[#B65B3C]">0{i + 1}</span>
+                <p className="text-[9px] font-bold text-[#D7D0C5] leading-tight group-hover:text-white">{title}</p>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* DEMO 05: Concierge Inquiry Funnel */}
+      {/* DEMO 05: Concierge Funnel */}
       {activeDemo === 'concierge' && (
-        <div className="p-6 md:p-8 bg-[#141414] border border-[#242424] rounded space-y-6">
+        <div className="hud-bracket p-6 md:p-8 bg-[#141414] border border-[#242424] rounded-sm space-y-6">
           <div className="border-b border-[#242424] pb-4">
-            <span className="text-xs font-mono text-[#B65B3C] uppercase">FRICTIONLESS CONCIERGE FUNNEL</span>
+            <span className="text-xs font-mono text-[#B65B3C] uppercase font-bold">HIGH-TICKET VIP CONCIERGE FUNNEL</span>
             <p className="text-sm font-bold text-[#F2EFE8] mt-0.5">
-              A 2-step direct VIP scheduling simulation with zero cognitive friction.
+              Cold forms hatao. Private, high-intent qualification pathway deliver karo.
             </p>
           </div>
 
-          <div className="max-w-md mx-auto space-y-4">
-            {conciergeStep === 1 ? (
-              <div className="space-y-4 p-5 rounded border border-[#242424] bg-[#111111]">
-                <span className="text-xs font-mono text-[#B65B3C]">STEP 01 / OCCASION TIMELINE</span>
-                <div>
-                  <label className="text-xs text-[#9B978F] block mb-1">Target Occasion Month</label>
-                  <select
-                    value={conciergeData.date}
-                    onChange={(e) => setConciergeData({ ...conciergeData, date: e.target.value })}
-                    className="w-full p-2.5 rounded bg-[#181818] border border-[#242424] text-xs text-[#F2EFE8]"
+          <div className="max-w-md mx-auto p-6 bg-[#0d0d0d] border border-[#242424] rounded-sm space-y-4">
+            <div className="flex items-center justify-between text-[10px] font-mono text-[#9B978F] border-b border-[#242424] pb-2">
+              <span>STEP {conciergeStep} OF 3</span>
+              <span className="text-[#B65B3C]">VIP CONCIERGE</span>
+            </div>
+
+            {conciergeStep === 1 && (
+              <div className="space-y-3">
+                <label className="text-xs font-mono text-[#F2EFE8] block">Select Your Occasion:</label>
+                {['Royal Destination Wedding', 'Private Heritage Retreat', 'Fine Culinary Residency'].map((occ) => (
+                  <button
+                    key={occ}
+                    onClick={() => {
+                      soundEngine.playClick();
+                      setConciergeData({ ...conciergeData, occasion: occ });
+                      setConciergeStep(2);
+                    }}
+                    className={`w-full p-3 rounded-sm border text-xs text-left cursor-pointer transition-colors ${
+                      conciergeData.occasion === occ ? 'border-[#B65B3C] bg-[#1a1816] text-[#F2EFE8]' : 'border-[#242424] text-[#9B978F] hover:text-[#F2EFE8]'
+                    }`}
                   >
-                    <option>November 2026</option>
-                    <option>December 2026</option>
-                    <option>Early 2027</option>
-                  </select>
-                </div>
-                <button
-                  onClick={() => setConciergeStep(2)}
-                  className="w-full py-2.5 rounded bg-[#F2EFE8] text-[#111111] text-xs font-semibold uppercase hover:bg-[#B65B3C] hover:text-[#F2EFE8] transition-colors"
-                >
-                  CONTINUE TO VIP CONCIERGE →
-                </button>
+                    {occ}
+                  </button>
+                ))}
               </div>
-            ) : (
-              <div className="space-y-4 p-5 rounded border border-[#B65B3C] bg-[#161413] text-center">
-                <span className="text-xs font-mono text-[#B65B3C]">STEP 02 / CONFIRMED PRIORITY</span>
-                <p className="text-sm font-bold text-[#F2EFE8]">
-                  Private Viewing Request Prepared
-                </p>
+            )}
+
+            {conciergeStep === 2 && (
+              <div className="space-y-3">
+                <label className="text-xs font-mono text-[#F2EFE8] block">Preferred Timeline:</label>
+                {['Q4 2026', 'Early 2027', 'Immediate Confidential'].map((dt) => (
+                  <button
+                    key={dt}
+                    onClick={() => {
+                      soundEngine.playTargetLock();
+                      setConciergeData({ ...conciergeData, date: dt });
+                      setConciergeStep(3);
+                    }}
+                    className="w-full p-3 rounded-sm border border-[#242424] text-xs text-left text-[#D7D0C5] hover:border-[#B65B3C] hover:text-[#F2EFE8] cursor-pointer"
+                  >
+                    {dt}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {conciergeStep === 3 && (
+              <div className="space-y-3 text-center py-4">
+                <div className="w-10 h-10 rounded-full bg-[#B65B3C]/20 border border-[#B65B3C] mx-auto flex items-center justify-center text-[#B65B3C]">
+                  ✓
+                </div>
+                <h5 className="text-sm font-bold text-[#F2EFE8]">PRIVATE CURATION READY</h5>
                 <p className="text-xs text-[#9B978F]">
-                  Selected: {conciergeData.occasion} · {conciergeData.date}
+                  Selected: {conciergeData.occasion} ({conciergeData.date})
                 </p>
                 <button
-                  onClick={() => setConciergeStep(1)}
-                  className="text-xs font-mono text-[#9B978F] hover:text-[#F2EFE8] underline"
+                  onClick={() => {
+                    soundEngine.playClick();
+                    setConciergeStep(1);
+                  }}
+                  className="text-[10px] font-mono text-[#B65B3C] underline cursor-pointer"
                 >
-                  ← Reset Demo
+                  Restart Demo Funnel
                 </button>
               </div>
             )}

@@ -23,6 +23,7 @@ import { AboutScene } from './scenes/AboutScene';
 import { Footer } from './components/Footer';
 import { ChallengeModal } from './components/ChallengeModal';
 import { ProjectModal } from './components/ProjectModal';
+import { Terminal, Crosshair, Radio } from 'lucide-react';
 
 // Register ScrollTrigger plugin with GSAP
 gsap.registerPlugin(ScrollTrigger);
@@ -141,7 +142,7 @@ function MainExperience() {
         <BusinessEngineScene />
       </section>
 
-      {/* 05. METHOD: See, Think, Build, Move + Service Architecture */}
+      {/* 05. METHOD: See, Think, Build, Move + Service Architecture (PUEP) */}
       <section className="gsap-scene-section relative">
         <PUEPFrameworkScene />
       </section>
@@ -187,7 +188,24 @@ function MainExperience() {
 export default function App() {
   return (
     <AWEProvider>
-      <div className="min-h-screen bg-[#111111] text-[#F2EFE8] flex flex-col font-sans selection:bg-[#B65B3C] selection:text-[#F2EFE8]">
+      <div className="min-h-screen bg-[#111111] text-[#F2EFE8] flex flex-col font-sans selection:bg-[#B65B3C] selection:text-[#F2EFE8] relative">
+        {/* Subtle AAA Game Scanline Overlay */}
+        <div className="scanlines-overlay fixed inset-0 z-30 pointer-events-none opacity-20" />
+
+        {/* Tactical Viewport Corner Brackets (AAA Game HUD) */}
+        <div className="fixed top-20 left-4 z-40 pointer-events-none hidden xl:flex flex-col gap-1 text-[9px] font-mono text-[#9B978F]/60">
+          <div className="flex items-center gap-1.5 text-[#B65B3C]">
+            <Radio className="w-2.5 h-2.5 animate-pulse" />
+            <span>SYS.AWE // ONLINE</span>
+          </div>
+          <span>GRID: TACTICAL_60FPS</span>
+        </div>
+
+        <div className="fixed top-20 right-4 z-40 pointer-events-none hidden xl:flex flex-col items-end gap-1 text-[9px] font-mono text-[#9B978F]/60">
+          <span>AUDIO ENGINE: READY</span>
+          <span className="text-[#B65B3C]">DISCIPLINE: AAA_MOTION</span>
+        </div>
+
         {/* Editorial Navigation */}
         <Navigation />
 

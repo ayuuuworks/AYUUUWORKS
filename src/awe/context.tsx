@@ -27,6 +27,9 @@ interface AWEContextValue {
   closeProjectModal: () => void;
   isNavOpen: boolean;
   setIsNavOpen: (open: boolean) => void;
+  language: 'hinglish' | 'english';
+  setLanguage: (lang: 'hinglish' | 'english') => void;
+  toggleLanguage: () => void;
 }
 
 const defaultSession: AWESessionData = {
@@ -68,6 +71,11 @@ export function AWEProvider({ children }: { children: ReactNode }) {
   } | null>(null);
   const [activeProjectModal, setActiveProjectModal] = useState<string | null>(null);
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [language, setLanguage] = useState<'hinglish' | 'english'>('hinglish');
+
+  const toggleLanguage = useCallback(() => {
+    setLanguage(prev => (prev === 'hinglish' ? 'english' : 'hinglish'));
+  }, []);
 
   // Audio synthesizer via Web Audio API for subtle cinematic feedback without external audio files
   const playSubtleTone = useCallback((freq = 440, type: OscillatorType = 'sine', duration = 0.15) => {
@@ -329,6 +337,9 @@ export function AWEProvider({ children }: { children: ReactNode }) {
         closeProjectModal,
         isNavOpen,
         setIsNavOpen,
+        language,
+        setLanguage,
+        toggleLanguage,
       }}
     >
       {children}
