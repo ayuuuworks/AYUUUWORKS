@@ -81,13 +81,13 @@ export const CuriosityScene: React.FC = () => {
         <div className="flex items-center gap-2 text-xs font-mono tracking-widest text-[#B65B3C] uppercase mb-3">
           <span>PERSPECTIVE · 02</span>
           <span>·</span>
-          <span>CURIOSITY WITH UTILITY</span>
+          <span>THINGS WORTH NOTICING</span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-black font-display text-[#F2EFE8] tracking-tight leading-tight">
-          QUESTIONS THAT REVEAL THE BOTTLENECK.
+          QUESTIONS THAT STAY WITH YOU.
         </h2>
         <p className="text-base text-[#9B978F] mt-3 leading-relaxed">
-          Curiosity is the beginning of strategy. Select a question to see how AyuuWorks examines digital business problems.
+          Some questions are more useful than answers. Pick one. See where it takes you.
         </p>
       </div>
 
@@ -134,7 +134,7 @@ export const CuriosityScene: React.FC = () => {
           <div className="p-6 md:p-8 rounded border border-[#242424] bg-[#161616] space-y-6">
             <div className="flex items-center justify-between border-b border-[#242424] pb-4">
               <span className="text-xs font-mono uppercase text-[#B65B3C] tracking-widest">
-                THE STUDIO PERSPECTIVE
+                ONE MORE THING.
               </span>
               <span className="text-xs font-mono text-[#9B978F]">
                 SYSTEM / {selected.system}
@@ -152,13 +152,13 @@ export const CuriosityScene: React.FC = () => {
 
             <div className="pt-4 border-t border-[#242424]">
               <p className="text-xs text-[#9B978F] mb-3">
-                How does this apply to your own business situation?
+                Maybe this has something to do with your business.
               </p>
               <button
                 onClick={jumpToExplorer}
                 className="w-full py-3 px-4 rounded bg-[#F2EFE8] hover:bg-[#B65B3C] text-[#111111] hover:text-[#F2EFE8] font-display font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 group cursor-pointer"
               >
-                <span>EXPLORE YOUR BUSINESS OPPORTUNITY</span>
+                <span>SEE WHAT IT REVEALS</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
