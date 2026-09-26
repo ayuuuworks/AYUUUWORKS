@@ -32,6 +32,7 @@ export const Navigation: React.FC = () => {
 
         {/* Desktop Nav Items: WORK, EXPLORE, METHOD, ABOUT, START */}
         <nav className="hidden md:flex items-center gap-8 text-xs uppercase tracking-widest text-[#9B978F]">
+          <a href="/casebook" className="hover:text-[#F2EFE8] transition-colors">CASEBOOK</a>
           <button
             onClick={() => scrollTo('projects-section', 'work')}
             className="hover:text-[#F2EFE8] transition-colors cursor-pointer"
@@ -101,6 +102,9 @@ export const Navigation: React.FC = () => {
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden border-b border-[#242424] bg-[#111111] px-6 py-6 space-y-4">
+          <a href="/casebook" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left py-2 text-sm tracking-wider text-[#D7D0C5] hover:text-[#F2EFE8]">
+            CASEBOOK
+          </a>
           <button
             onClick={() => scrollTo('projects-section', 'work')}
             className="block w-full text-left py-2 text-sm tracking-wider text-[#D7D0C5] hover:text-[#F2EFE8]"
