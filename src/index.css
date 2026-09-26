@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* Editorial Future Palette */
+    --color-ink: #111111;
+    --color-ivory: #F2EFE8;
+    --color-stone: #D7D0C5;
+    --color-soft-grey: #9B978F;
+    --color-charcoal: #242424;
+    --color-accent: #B65B3C;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: #111111;
+    color: #F2EFE8;
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
+  }
+
+  p {
+    line-height: 1.65;
+  }
+}
+
+/* Editorial architectural grid lines */
+.bg-editorial-grid {
+  background-image: linear-gradient(to right, rgba(215, 208, 197, 0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(215, 208, 197, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Subtle architectural divider */
+.border-editorial {
+  border-color: #242424;
+}
+
+.border-stone-subtle {
+  border-color: rgba(215, 208, 197, 0.15);
+}
+
+/* Accent highlight */
+.text-accent {
+  color: #B65B3C;
+}
+
+.bg-accent {
+  background-color: #B65B3C;
+}
+
+.border-accent {
+  border-color: #B65B3C;
+}
+
+/* Restrained scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111111;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #242424;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B65B3C;
+}
