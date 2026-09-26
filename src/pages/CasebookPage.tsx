@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowUpRight, Bookmark, Camera, FileText, Play, Search, Sparkles, Check, LockKeyhole, X } from 'lucide-react';
+import { ArrowUpRight, Bookmark, ExternalLink, Camera, FileText, Play, Search, Sparkles, Check, LockKeyhole, X } from 'lucide-react';
 import { caseFiles, caseFilters } from '../casebook/data/cases';
 import { MediaEvidence } from '../casebook/components/MediaEvidence';
 import { MediaLightbox } from '../casebook/components/MediaLightbox';
@@ -157,6 +157,21 @@ export const CasebookPage: React.FC = () => {
                   {item.title}
                 </h3>
                 <p className="mt-4 text-sm leading-6 text-[#4d4943]">{item.summary}</p>
+                <div className="mt-4 flex flex-wrap gap-2 text-[8px] font-mono uppercase tracking-[0.12em] text-[#6b665d]">
+                  {item.year && <span className="border border-[#111111]/15 px-2 py-1">{item.year}</span>}
+                  {item.region && <span className="border border-[#111111]/15 px-2 py-1">{item.region}</span>}
+                  <span className="border border-[#111111]/15 px-2 py-1">{item.sources.length} SOURCE{item.sources.length === 1 ? '' : 'S'}</span>
+                </div>
+                <div className="mt-4 border-t border-[#111111]/10 pt-3">
+                  <p className="font-mono text-[8px] tracking-[0.16em] text-[#B65B3C]">RESEARCH TRAIL</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {item.sources.map((sourceItem) => (
+                      <a key={sourceItem.url} href={sourceItem.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 border border-[#111111]/15 px-2 py-1 text-[8px] uppercase tracking-[0.08em] hover:border-[#B65B3C]">
+                        {sourceItem.type === 'PRIMARY' ? 'PRIMARY' : 'SECONDARY'} / {sourceItem.name} <ExternalLink className="h-2.5 w-2.5" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
 
                 <div className="mt-6 border-l-2 border-[#B65B3C] bg-[#F2EFE8] p-4">
                   <p className="font-mono text-[9px] tracking-[0.18em] text-[#B65B3C]">CLUE</p>
