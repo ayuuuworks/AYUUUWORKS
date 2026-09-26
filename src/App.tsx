@@ -186,7 +186,7 @@ function MainExperience() {
 }
 
 export default function App() {
-  const path = window.location.pathname.replace(/\\/$/, '') || '/';
+  const path = window.location.pathname.replace(/\/$/, '') || '/';
 
   if (path === '/casebook') {
     return (
