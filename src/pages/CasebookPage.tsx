@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowUpRight, Bookmark, Camera, FileText, Play, Search, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Bookmark, Camera, FileText, Play, Search, Sparkles, Check, LockKeyhole, X } from 'lucide-react';
 import { caseFiles, caseFilters } from '../casebook/data/cases';
 import { MediaEvidence } from '../casebook/components/MediaEvidence';
 import { MediaLightbox } from '../casebook/components/MediaLightbox';
@@ -15,11 +15,15 @@ export const CasebookPage: React.FC = () => {
   const [filter, setFilter] = useState<(typeof caseFilters)[number]>('ALL');
   const [saved, setSaved] = useState<string[]>([]);
   const [activeMedia, setActiveMedia] = useState<import('../casebook/data/cases').CaseMedia | null>(null);
+  const [activeCase, setActiveCase] = useState<(typeof caseFiles)[number] | null>(null);
+  const [revealed, setRevealed] = useState<string[]>([]);
 
   const visibleCases = useMemo(
     () => filter === 'ALL' ? caseFiles : caseFiles.filter((item) => item.type === filter),
     [filter]
   );
+
+  const reveal = (key: string) => setRevealed((current) => current.includes(key) ? current : [...current, key]);
 
   const toggleSaved = (id: string) => {
     setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
@@ -134,7 +138,7 @@ export const CasebookPage: React.FC = () => {
                 </div>
 
                 <div className="mt-5 flex items-center justify-between">
-                  <button className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] hover:text-[#B65B3C]">
+                  <button onClick={() => { setActiveCase(item); setRevealed([]); }} className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] hover:text-[#B65B3C]">
                     CASE KHOLO <ArrowUpRight className="h-3.5 w-3.5" />
                   </button>
                   <button
@@ -171,6 +175,78 @@ export const CasebookPage: React.FC = () => {
         </div>
       </section>
       {activeMedia && <MediaLightbox media={activeMedia} onClose={() => setActiveMedia(null)} />}
+      {activeCase && (
+        <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#111111]/95 p-4 md:p-8" role="dialog" aria-modal="true">
+          <div className="mx-auto max-w-6xl border border-[#F2EFE8]/15 bg-[#F2EFE8] text-[#111111]">
+            <div className="flex items-center justify-between border-b border-[#111111]/15 p-4 md:p-6">
+              <div>
+                <p className="font-mono text-[9px] tracking-[0.22em] text-[#B65B3C]">CASE / {activeCase.number} / INVESTIGATION DESK</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.16em]">{activeCase.field}</p>
+              </div>
+              <button onClick={() => setActiveCase(null)} aria-label="Close case" className="border border-[#111111]/15 p-2 hover:border-[#B65B3C]"><X className="h-4 w-4" /></button>
+            </div>
+            <div className="grid gap-10 p-5 md:grid-cols-[1fr_0.8fr] md:p-10">
+              <div>
+                <p className="font-mono text-[9px] tracking-[0.2em] text-[#B65B3C]">CASE FILE</p>
+                <h2 className="mt-3 font-display text-4xl font-semibold uppercase leading-[0.9] tracking-[-0.05em] md:text-7xl">{activeCase.title}</h2>
+                <p className="mt-6 max-w-2xl text-base leading-7 text-[#514c45]">{activeCase.summary}</p>
+                <div className="mt-10">
+                  <p className="font-mono text-[9px] tracking-[0.2em] text-[#B65B3C]">EVIDENCE</p>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {activeCase.media.map((media) => (
+                      <button key={media.title} onClick={() => setActiveMedia(media)} className="text-left"><MediaEvidence media={media} compact /></button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="border-l border-[#111111]/15 pl-0 md:pl-8">
+                <p className="font-mono text-[9px] tracking-[0.2em] text-[#B65B3C]">INVESTIGATION</p>
+                <p className="mt-3 text-sm leading-6 text-[#5b574f]">Pehle facts. Phir clues. Phir sawaal. Verdict nahi, understanding.</p>
+                <div className="mt-7 space-y-3">
+                  {activeCase.investigation.facts.map((fact, i) => (
+                    <div key={fact} className="border border-[#111111]/15 bg-[#ebe7df] p-4">
+                      <p className="font-mono text-[8px] tracking-[0.16em] text-[#6b665d]">FACT / 0{i + 1}</p>
+                      <p className="mt-2 text-sm leading-6">{fact}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-7">
+                  <p className="font-mono text-[9px] tracking-[0.2em] text-[#B65B3C]">CLUES</p>
+                  <div className="mt-3 space-y-2">
+                    {activeCase.investigation.clues.map((clue, i) => {
+                      const key = activeCase.id + '-clue-' + i;
+                      const open = revealed.includes(key);
+                      return (
+                        <button key={key} onClick={() => reveal(key)} className="w-full border border-[#111111]/15 p-4 text-left hover:border-[#B65B3C]">
+                          <div className="flex items-center gap-3">
+                            {open ? <Check className="h-4 w-4 text-[#B65B3C]" /> : <LockKeyhole className="h-4 w-4 opacity-50" />}
+                            <span className="font-mono text-[9px] tracking-[0.16em]">CLUE / 0{i + 1}</span>
+                          </div>
+                          {open ? <p className="mt-3 text-sm leading-6">{clue}</p> : <p className="mt-3 text-xs uppercase tracking-[0.12em] text-[#6b665d]">Click karke clue kholo</p>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="mt-7 border-l-2 border-[#B65B3C] bg-[#ebe7df] p-5">
+                  <p className="font-mono text-[9px] tracking-[0.18em] text-[#B65B3C]">QUESTIONS TO INVESTIGATE</p>
+                  <div className="mt-3 space-y-3">
+                    {activeCase.investigation.questions.map((question) => <p key={question} className="text-sm leading-6">“{question}”</p>)}
+                  </div>
+                </div>
+                {activeCase.investigation.clues.every((_, i) => revealed.includes(activeCase.id + '-clue-' + i)) && (
+                  <div className="mt-7 border border-[#B65B3C] bg-[#111111] p-5 text-[#F2EFE8]">
+                    <p className="font-mono text-[9px] tracking-[0.18em] text-[#B65B3C]">CASE STATUS</p>
+                    <p className="mt-2 font-display text-2xl font-semibold uppercase">CLUES CONNECTED.</p>
+                    <p className="mt-3 text-sm leading-6 text-[#D7D0C5]">{activeCase.investigation.takeaway}</p>
+                    <p className="mt-4 font-mono text-[8px] uppercase tracking-[0.16em] text-[#9B978F]">AYUUWORKS INTERPRETATION / NOT A FACTUAL CLAIM</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
