@@ -6,6 +6,7 @@ import { MediaLightbox } from '../casebook/components/MediaLightbox';
 import { Caseboard, SavedClue } from '../casebook/components/Caseboard';
 import { BrainPanel } from '../casebook/components/BrainPanel';
 import { BusinessExplorer } from '../casebook/components/BusinessExplorer';
+import { SoundControl, SoundMode, useCasebookSound } from '../casebook/sound';
 
 const evidence = [
   { label: 'EVIDENCE', title: 'REAL CAMPAIGNS', text: 'Ads, launches aur brand moments jo actually duniya ne dekhe.', icon: Camera },
@@ -25,6 +26,8 @@ export const CasebookPage: React.FC = () => {
   const [caseboardOpen, setCaseboardOpen] = useState(false);
   const [brainOpen, setBrainOpen] = useState(false);
   const [explorerOpen, setExplorerOpen] = useState(false);
+  const [soundMode, setSoundMode] = useState<SoundMode>(() => (localStorage.getItem('ayuuworks-casebook-sound') as SoundMode) || 'QUIET');
+  const playSound = useCasebookSound(soundMode);
 
 
   const visibleCases = useMemo(
@@ -32,10 +35,11 @@ export const CasebookPage: React.FC = () => {
     [filter]
   );
 
-  const reveal = (key: string) => setRevealed((current) => current.includes(key) ? current : [...current, key]);
+  const reveal = (key: string) => { playSound('clue'); setRevealed((current) => current.includes(key) ? current : [...current, key]); };
 
   const saveDiscoveredClue = (caseItem: (typeof caseFiles)[number], clue: string, index: number) => {
     const entry: SavedClue = { id: caseItem.id + '-discovered-' + index, caseId: caseItem.id, caseNumber: caseItem.number, caseTitle: caseItem.title, clue };
+    playSound('pin');
     setSaved((current) => current.some((item) => item.id === entry.id) ? current : [...current, entry]);
   };
 
@@ -43,10 +47,12 @@ export const CasebookPage: React.FC = () => {
     const item = caseFiles.find((entry) => entry.id === id);
     if (!item) return;
     const clue: SavedClue = { id: item.id + '-main-clue', caseId: item.id, caseNumber: item.number, caseTitle: item.title, clue: item.clue };
+    playSound('pin');
     setSaved((current) => current.some((entry) => entry.id === clue.id) ? current.filter((entry) => entry.id !== clue.id) : [...current, clue]);
   };
 
   React.useEffect(() => { localStorage.setItem('ayuuworks-caseboard', JSON.stringify(saved)); }, [saved]);
+  React.useEffect(() => { localStorage.setItem('ayuuworks-casebook-sound', soundMode); }, [soundMode]);
   React.useEffect(() => { const open = () => setCaseboardOpen(true); window.addEventListener('open-caseboard', open); return () => window.removeEventListener('open-caseboard', open); }, []);
 
   return (
@@ -140,7 +146,7 @@ export const CasebookPage: React.FC = () => {
 
                 <div className="my-5 grid gap-3">
                   {item.media.slice(0, 2).map((media) => (
-                    <button key={media.title} onClick={() => setActiveMedia(media)} className="text-left" aria-label={`Open ${media.title}`}>
+                    <button key={media.title} onClick={() => { playSound('media'); setActiveMedia(media); }} className="text-left" aria-label={`Open ${media.title}`}>
                       <MediaEvidence media={media} compact />
                     </button>
                   ))}
@@ -208,7 +214,8 @@ export const CasebookPage: React.FC = () => {
       {explorerOpen && <BusinessExplorer savedClues={saved.length} onClose={() => setExplorerOpen(false)} />}
       {brainOpen && <BrainPanel clues={saved} onClose={() => setBrainOpen(false)} />}
       {caseboardOpen && <Caseboard clues={saved} onRemove={(id) => setSaved((current) => current.filter((item) => item.id !== id))} onClose={() => setCaseboardOpen(false)} />}
-      <button onClick={() => setBrainOpen(true)} className="fixed bottom-5 right-[150px] z-40 inline-flex items-center gap-2 border border-[#B65B3C] bg-[#111111] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#F2EFE8] shadow-lg hover:bg-[#B65B3C]"><Sparkles className="h-3.5 w-3.5" /> BRAIN</button>
+      <SoundControl mode={soundMode} onModeChange={(mode) => { setSoundMode(mode); playSound('paper'); }} />
+      <button onClick={() => { playSound('brain'); setBrainOpen(true); }} className="fixed bottom-5 right-[150px] z-40 inline-flex items-center gap-2 border border-[#B65B3C] bg-[#111111] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#F2EFE8] shadow-lg hover:bg-[#B65B3C]"><Sparkles className="h-3.5 w-3.5" /> BRAIN</button>
       <button onClick={() => window.dispatchEvent(new Event("open-caseboard"))} className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 border border-[#111111]/20 bg-[#F2EFE8] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.16em] shadow-lg hover:border-[#B65B3C]"><Bookmark className="h-3.5 w-3.5" fill={saved.length ? "currentColor" : "none"} /> CASEBOARD {saved.length ? ` / ${saved.length}` : ""}</button>
       {activeCase && (
         <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#111111]/95 p-4 md:p-8" role="dialog" aria-modal="true">
