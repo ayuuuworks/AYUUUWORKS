@@ -41,7 +41,7 @@ export const MediaEvidence: React.FC<{ media: CaseMedia; compact?: boolean }> = 
         </div>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[#111111]/10 pt-3 text-[8px] uppercase tracking-[0.14em] text-[#716c63]">
           <span>Source: {media.sourceName}</span>
-          <span>{media.usage === 'REPLACE' ? 'VERIFY BEFORE PUBLISH' : media.usage}</span>
+          <span>{media.evidenceStatus === 'VERIFIED' ? 'VERIFIED SOURCE' : media.evidenceStatus === 'SECONDARY' ? 'SECONDARY SOURCE' : 'ASSET NEEDED'}</span>
         </div>
       </div>
     </div>
